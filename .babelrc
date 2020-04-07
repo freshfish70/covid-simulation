@@ -1,7 +1,18 @@
 {
-  "presets": ["@babel/env", "@babel/typescript"],
+  "presets": [
+    [
+      "@babel/env",
+      {
+        "targets": {
+          "browsers": "last 2 versions, ie 10-11"
+        },
+        "modules": false
+      }
+    ],
+    "@babel/typescript"
+  ],
   "plugins": [
     "@babel/proposal-class-properties",
-    "@babel/proposal-object-rest-spread"
+    "@babel/proposal-object-rest-spread",
   ]
 }
