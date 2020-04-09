@@ -13,6 +13,13 @@ export class Person extends GridLocation {
 	 */
 	private _state: Compartment = Compartment.SUSCEPTIBLE
 
+	private _infectionTime: Number | undefined
+
+	/**
+	 * How many have this person ifected
+	 */
+	private _infected: Number = 0
+
 	constructor(grid: Grid, position: Point) {
 		super(grid, position)
 	}
@@ -23,6 +30,12 @@ export class Person extends GridLocation {
 
 	public set state(v: Compartment) {
 		this._state = v
+	}
+
+
+	public infect() {
+		this._infectionTime = Date.now()
+		this._state = Compartment.INFECTED
 	}
 
 	public act() {
