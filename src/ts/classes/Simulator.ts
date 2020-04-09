@@ -12,7 +12,7 @@ export class Simulator {
 
 	private readonly _cellSize: number = 10
 
-	private readonly _runspeed: number = 5
+	private readonly _runspeed: number = 3
 
 	private _simulationArea: Grid
 
