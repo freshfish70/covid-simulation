@@ -14,6 +14,8 @@ export class Simulator {
 
 	private readonly _runspeed: number = 3
 
+	private readonly _framerate: number = 30
+
 	private _simulationArea: Grid
 
 	private readonly _entities: number
@@ -49,7 +51,7 @@ export class Simulator {
 			 */
 			sketch.setup = () => {
 				sketch.createCanvas(this._x, this._y)
-				this.PopulateGrid()
+				sketch.frameRate(this._framerate)
 				console.log('Setup complete')
 			}
 			/**
