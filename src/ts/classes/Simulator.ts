@@ -51,6 +51,7 @@ export class Simulator {
 			 */
 			sketch.setup = () => {
 				sketch.createCanvas(this._x, this._y)
+				this.populateGrid()
 				sketch.frameRate(this._framerate)
 				console.log('Setup complete')
 			}
@@ -61,14 +62,7 @@ export class Simulator {
 				if (sketch.frameCount % this._runspeed == 0) {
 					sketch.background('#081B2E')
 
-					for (var x = 0; x < this._x; x += this._cellSize) {
-						for (var y = 0; y < this._y; y += this._cellSize) {
-							sketch.stroke('#0C2E45')
-							sketch.strokeWeight(0.1)
-							sketch.line(x, 0, x, this._y)
-							sketch.line(0, y, this._x, y)
-						}
-					}
+					// this.showGrid()
 
 					let grid = this._simulationArea.grid
 					const xsize = grid.length
@@ -120,7 +114,25 @@ export class Simulator {
 		this._p5 = new p5(runable)
 	}
 
-	private PopulateGrid() {
+	/**
+	 * Displays the grid on the canvas
+	 */
+	private showGrid() {
+		// Diplay grid
+		this._p5.stroke('#0C2E45')
+		this._p5.strokeWeight(0.1)
+		for (var x = 0; x < this._x; x += this._cellSize) {
+			for (var y = 0; y < this._y; y += this._cellSize) {
+				this._p5.line(x, 0, x, this._y)
+				this._p5.line(0, y, this._x, y)
+			}
+		}
+	}
+
+	/**
+	 * Populates the grid with people
+	 */
+	private populateGrid() {
 		let grid = this._simulationArea.grid
 		let chosenLocations = 0
 		// Used for debugging tries the selection of cells uses, and also for
