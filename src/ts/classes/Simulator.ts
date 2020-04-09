@@ -75,6 +75,18 @@ export class Simulator {
 								if (gridLocation instanceof Person) {
 									//! TEMPORARY COLORING METHOD
 									let person = gridLocation as Person
+									if (person.isInQuarantine) {
+										sketch.fill('#081B2E')
+										sketch.strokeWeight(0.3)
+										sketch.stroke('#999')
+										sketch.rectMode('center')
+										sketch.rect(
+											person.position.x * this._cellSize + 5,
+											person.position.y * this._cellSize + 5,
+											this._cellSize,
+											this._cellSize
+										)
+									}
 									switch (person.state) {
 										case Compartment.SUSCEPTIBLE:
 											sketch.stroke('#FFDE91')
@@ -93,6 +105,7 @@ export class Simulator {
 											break
 									}
 									//! END TEMPORARY COLORING METHOD
+
 									sketch.strokeWeight(5)
 									sketch.point(
 										person.position.x * this._cellSize + 5,
@@ -104,6 +117,7 @@ export class Simulator {
 						}
 					}
 				}
+
 				let fps = sketch.frameRate()
 				sketch.fill(255)
 				sketch.stroke(0)
@@ -150,6 +164,7 @@ export class Simulator {
 					p.state = Compartment.SUSCEPTIBLE
 				} else if (a < 0.4) {
 					p.state = Compartment.INFECTED
+					p.isInQuarantine = true
 				} else if (a < 0.6) {
 					p.state = Compartment.RECOVERED
 				} else {

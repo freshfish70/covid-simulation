@@ -1,3 +1,3 @@
 import { Simulator } from './classes/Simulator'
 
-const simulator = new Simulator(1000, 600, 100)
+const simulator = new Simulator(900, 500, 35)
