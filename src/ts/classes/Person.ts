@@ -20,6 +20,11 @@ export class Person extends GridLocation {
 	 */
 	private _infected: Number = 0
 
+	/**
+	 * Is the person in quarantine?
+	 */
+	private _inQuarantine = false
+
 	constructor(grid: Grid, position: Point) {
 		super(grid, position)
 	}
@@ -32,6 +37,13 @@ export class Person extends GridLocation {
 		this._state = v
 	}
 
+	public get isInQuarantine(): boolean {
+		return this._inQuarantine
+	}
+
+	public set isInQuarantine(quarantine: boolean) {
+		this._inQuarantine = quarantine
+	}
 
 	public infect() {
 		this._infectionTime = Date.now()
@@ -39,7 +51,12 @@ export class Person extends GridLocation {
 	}
 
 	public act() {
+		// Quarantined, and dead peaple cant act.
+		if (this._state == Compartment.DEAD || this._inQuarantine) return
+
 		let p = this.grid.getRndAdjecentLocationFromPoint(this.position, 1)
+		if (!p) return
+
 		this.position.x = p.x
 		this.position.y = p.y
 	}
