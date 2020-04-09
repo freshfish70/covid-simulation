@@ -81,28 +81,26 @@ export class Simulator {
 									let person = gridLocation as Person
 									switch (person.state) {
 										case Compartment.SUSCEPTIBLE:
-											sketch.fill('#FFDE91')
+											sketch.stroke('#FFDE91')
 											break
 										case Compartment.INFECTED:
-											sketch.fill('#B32144')
-											// sketch.fill('#4265B3')
+											sketch.stroke('#B32144')
+											// sketch.stroke('#4265B3')
 											break
 										case Compartment.RECOVERED:
-											sketch.fill('#12ABB3')
+											sketch.stroke('#12ABB3')
 											break
 										case Compartment.DEAD:
-											sketch.fill('#000')
+											sketch.stroke('#000')
 											break
 										default:
 											break
 									}
 									//! END TEMPORARY COLORING METHOD
-
-									sketch.ellipse(
+									sketch.strokeWeight(5)
+									sketch.point(
 										person.position.x * this._cellSize + 5,
-										person.position.y * this._cellSize + 5,
-										this._cellSize,
-										this._cellSize
+										person.position.y * this._cellSize + 5
 									)
 									person?.act()
 								}
