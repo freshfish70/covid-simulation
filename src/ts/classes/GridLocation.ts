@@ -28,4 +28,15 @@ export class GridLocation {
 	protected get grid(): Grid {
 		return this._grid
 	}
+
+	/**
+	 * Sets the new position for the GridLocation
+	 * and clears its old position
+	 * @param position new position
+	 */
+	public setNewPosition(position: Point) {
+		this._grid.freeLocation(this._position)
+		this._position = position
+		this._grid.addToLocation(this, position)
+	}
 }

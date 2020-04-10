@@ -13,12 +13,20 @@ export class Person extends GridLocation {
 	 */
 	private _state: Compartment = Compartment.SUSCEPTIBLE
 
-	private _infectionTime: Number | undefined
+	/**
+	 * Time stamp when person was infected
+	 */
+	private _infectionTime: number = 0
+
+	/**
+	 * Time person uses to recover (milliseconds)
+	 */
+	private readonly _recoveryTime: number = 7000
 
 	/**
 	 * How many have this person ifected
 	 */
-	private _infected: Number = 0
+	private _peopleInfected: number = 0
 
 	/**
 	 * Is the person in quarantine?
@@ -45,6 +53,9 @@ export class Person extends GridLocation {
 		this._inQuarantine = quarantine
 	}
 
+	/**
+	 * Infects the person, and set a time stamp for when the person was infected
+	 */
 	public infect() {
 		this._infectionTime = Date.now()
 		this._state = Compartment.INFECTED
@@ -54,11 +65,37 @@ export class Person extends GridLocation {
 		// Quarantined, and dead peaple cant act.
 		if (this._state == Compartment.DEAD || this._inQuarantine) return
 
-		let p = this.grid.getRndAdjecentLocationFromPoint(this.position, 1)
-		if (!p) return
+		if (this.state == Compartment.INFECTED) {
+			this.tryInfectSurounings()
+			if (this._infectionTime + this._recoveryTime < Date.now()) {
+				this.state = Compartment.RECOVERED
+			}
+		}
 
-		this.position.x = p.x
-		this.position.y = p.y
+		// Move entity to new position of there are any free positions around
+		this.setNewPosition(
+			this.grid.getRandomFreeLocationFromPoint(this.position, 1)
+		)
+	}
+
+	/**
+	 * Checks adjencent locations around the person, and if there are any persons
+	 * adjevent to this person, try to infect them
+	 */
+	private tryInfectSurounings() {
+		let adjecentLocations = this.grid.getAdjacentLocationsFromPoint(
+			this.position,
+			1
+		)
+		adjecentLocations.forEach((location) => {
+			const person = this.grid.getObjectAtLocation(location)
+			if (person instanceof Person) {
+				if (person.state == Compartment.SUSCEPTIBLE) {
+					person.infect()
+					this._peopleInfected++
+				}
+			}
+		})
 	}
 }
 

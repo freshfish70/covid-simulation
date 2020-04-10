@@ -10,7 +10,7 @@ export class Grid {
 
 	private _sizeY: number = 1
 
-	private _grid: Array<Array<GridLocation | null>>
+	public _grid: Array<Array<GridLocation | null>>
 
 	constructor(sizeX: number, sizeY: number) {
 		this._sizeX = sizeX
@@ -38,16 +38,31 @@ export class Grid {
 	}
 
 	/**
-	 * Returns a random adjecent location from the provided X and Y coorinate.
-	 * The location will allways be inside the grid.
-	 *
-	 * @param x x position to get adjecent from
-	 * @param y y position to get adjenct from
-	 * @param size how large the "adjecent" search is
+	 * Sets the location to null
+	 * @param location location to free up
 	 */
-	public getRndAdjecentLocationFromXY(x: number, y: number, size: number) {
-		const selected: Array<Point> = new Array()
+	public freeLocation(location: Point) {
+		this._grid[location.x][location.y] = null
+	}
 
+	/**
+	 * Adds the grid location to the grid
+	 * @param gridLocation grid location type to add
+	 */
+	public addToLocation(gridLocation: GridLocation, location: Point) {
+		this._grid[location.x][location.y] = gridLocation
+	}
+
+	/**
+	 * Returns the object at location
+	 * @param location the location to get object at
+	 */
+	public getObjectAtLocation(location: Point): GridLocation | null {
+		return this._grid[location.x][location.y]
+	}
+
+	public getAdjacentLocationsFromXY(x: number, y: number, size: number) {
+		const selected: Array<Point> = new Array()
 		for (let row = -size; row <= size; row++) {
 			const currentRow = x + row
 			if (currentRow >= 0 && currentRow < this.sizeX) {
@@ -58,27 +73,62 @@ export class Grid {
 						currentColumn < this.sizeY &&
 						(column != 0 || row != 0)
 					) {
-						if (this._grid[currentRow][currentColumn] == null) {
-							selected.push(new Point(currentRow, currentColumn))
-						}
+						selected.push(new Point(currentRow, currentColumn))
 					}
 				}
 			}
 		}
-
 		this.shuffle(selected)
-		return selected[0]
+		return selected
 	}
 
 	/**
-	 * Returns a random adjecent location from the provided X and Y coorinate.
-	 * The location will allways be inside the grid.
-	 *
-	 * @point position the position to get adjecent of
-	 * @param size how large the "adjecent" search is
+	 * Returns all adjec
+	 * @param location the center point to search from
+	 * @param size how large the "adjacent" search is
 	 */
-	public getRndAdjecentLocationFromPoint(position: Point, size: number) {
-		return this.getRndAdjecentLocationFromXY(position.x, position.y, size)
+	public getAdjacentLocationsFromPoint(location: Point, size: number) {
+		return this.getAdjacentLocationsFromXY(location.x, location.y, size)
+	}
+
+	/**
+	 * Returns a random adjacent location from the provided X and Y coorinate.
+	 * The location will allways be inside the grid, and can be null.
+	 *
+	 * @param x x position to get adjacent from
+	 * @param y y position to get adjenct from
+	 * @param size how large the "adjacent" search is
+	 */
+	public getRdAadjacentLocationFromXY(x: number, y: number, size: number) {
+		return this.getAdjacentLocationsFromXY(x, y, size)[0]
+	}
+
+	/**
+	 * Returns a random adjacent location from the provided point coorinate.
+	 * The location will allways be inside the grid, and can be null.
+	 *
+	 * @param point center position to search from
+	 * @param size how large the "adjacent" search is
+	 */
+	public getRdAadjacentLocationFromPoint(position: Point, size: number) {
+		return this.getAdjacentLocationsFromXY(position.x, position.y, size)[0]
+	}
+
+	/**
+	 * Returns a random free location around the provided point with a serch size
+	 * of the provided size. If there are no free locations, returns current location
+	 * @param position center position to search from
+	 * @param size how large the "adjacent" search is
+	 */
+	public getRandomFreeLocationFromPoint(position: Point, size: number) {
+		const locations = this.getAdjacentLocationsFromPoint(position, size)
+		let newLocation: Point = position
+		locations.forEach((location) => {
+			if (this.getObjectAtLocation(location) == null) {
+				newLocation = location
+			}
+		})
+		return newLocation
 	}
 
 	/**
@@ -87,7 +137,7 @@ export class Grid {
 	 * > https://javascript.info/task/shuffle
 	 * @param array array to shuffle
 	 */
-	public shuffle(array: Array<any>) {
+	private shuffle(array: Array<any>) {
 		for (let i = array.length - 1; i > 0; i--) {
 			let j = Math.floor(Math.random() * (i + 1))
 			;[array[i], array[j]] = [array[j], array[i]]

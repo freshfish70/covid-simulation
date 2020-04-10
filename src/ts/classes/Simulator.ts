@@ -2,23 +2,44 @@ import p5, { Color } from 'p5'
 import { Grid } from './Grid'
 import { Person, Compartment } from './Person'
 import { Point } from './Point'
+import { QuadTree } from './QuadTree'
 
 export class Simulator {
 	private _p5: p5
 
-	private _x: number
+	private _width: number
 
-	private _y: number
+	private _height: number
 
+	// The size of a cell that an entity will be living in
 	private readonly _cellSize: number = 10
 
-	private readonly _runspeed: number = 3
+	// How fast the simulaition will go
+	private readonly _runspeed: number = 2
 
+	// The desired frame rate to run the simulation at
 	private readonly _framerate: number = 30
 
+	// The grid, where all entities are stored in idividual cells.
 	private _simulationArea: Grid
 
+	// Number of entities/persons in the simulation
 	private readonly _entities: number
+
+	// All persons that are in the simulations
+	private _persons: Array<Person> = new Array()
+
+	// ! Temporary
+
+	private infected = 0
+
+	private suceptible = 0
+
+	private reocvered = 0
+
+	private dead = 0
+
+	// !END TEMPORARY
 
 	constructor(x: number, y: number, numberOfEntities: number) {
 		// Just make sure we get even sized cells
@@ -28,13 +49,13 @@ export class Simulator {
 		if (y % this._cellSize > 0)
 			throw new Error(`Y size is not divideable by ${this._cellSize}`)
 
-		this._x = x
-		this._y = y
+		this._width = x
+		this._height = y
 		this._entities = numberOfEntities
 
 		this._simulationArea = new Grid(
-			this._x / this._cellSize,
-			this._y / this._cellSize
+			this._width / this._cellSize,
+			this._height / this._cellSize
 		)
 
 		this.initialize()
@@ -50,7 +71,7 @@ export class Simulator {
 			 * Runs once
 			 */
 			sketch.setup = () => {
-				sketch.createCanvas(this._x, this._y)
+				sketch.createCanvas(this._width, this._height)
 				this.populateGrid()
 				sketch.frameRate(this._framerate)
 				console.log('Setup complete')
@@ -60,72 +81,85 @@ export class Simulator {
 			 */
 			sketch.draw = () => {
 				if (sketch.frameCount % this._runspeed == 0) {
-					sketch.background('#081B2E')
+					// !Improve this
+					this.suceptible = 0
+					this.infected = 0
+					this.reocvered = 0
+					this.dead = 0
 
+					sketch.background('#081B2E')
 					// this.showGrid()
 
-					let grid = this._simulationArea.grid
-					const xsize = grid.length
-
-					for (let x = 0; x < xsize; x++) {
-						const ysize = grid[x].length
-						for (let y = 0; y < ysize; y++) {
-							let gridLocation = grid[x][y]
-							if (gridLocation) {
-								if (gridLocation instanceof Person) {
-									//! TEMPORARY COLORING METHOD
-									let person = gridLocation as Person
-									if (person.isInQuarantine) {
-										sketch.fill('#081B2E')
-										sketch.strokeWeight(0.3)
-										sketch.stroke('#999')
-										sketch.rectMode('center')
-										sketch.rect(
-											person.position.x * this._cellSize + 5,
-											person.position.y * this._cellSize + 5,
-											this._cellSize,
-											this._cellSize
-										)
-									}
-									switch (person.state) {
-										case Compartment.SUSCEPTIBLE:
-											sketch.stroke('#FFDE91')
-											break
-										case Compartment.INFECTED:
-											sketch.stroke('#B32144')
-											// sketch.stroke('#4265B3')
-											break
-										case Compartment.RECOVERED:
-											sketch.stroke('#12ABB3')
-											break
-										case Compartment.DEAD:
-											sketch.stroke('#000')
-											break
-										default:
-											break
-									}
-									//! END TEMPORARY COLORING METHOD
-
-									sketch.strokeWeight(5)
-									sketch.point(
-										person.position.x * this._cellSize + 5,
-										person.position.y * this._cellSize + 5
-									)
-									person?.act()
-								}
-							}
+					for (const person of this._persons) {
+						//! TEMPORARY COLORING METHOD
+						if (person.isInQuarantine) {
+							sketch.fill('#081B2E')
+							sketch.strokeWeight(0.3)
+							sketch.stroke('#999')
+							sketch.rectMode('center')
+							sketch.rect(
+								person.position.x * this._cellSize + 5,
+								person.position.y * this._cellSize + 5,
+								this._cellSize,
+								this._cellSize
+							)
 						}
+						switch (person.state) {
+							case Compartment.SUSCEPTIBLE:
+								this.suceptible++
+								sketch.stroke('#FFDE91')
+								break
+							case Compartment.INFECTED:
+								this.infected++
+								sketch.stroke('#B32144')
+								// sketch.stroke('#4265B3')
+								break
+							case Compartment.RECOVERED:
+								this.reocvered++
+								sketch.stroke('#12ABB3')
+								break
+							case Compartment.DEAD:
+								this.dead++
+								sketch.stroke('#000')
+								break
+							default:
+								sketch.stroke('#fff')
+								break
+						}
+						//! END TEMPORARY COLORING METHOD
+
+						sketch.strokeWeight(5)
+						sketch.point(
+							person.position.x * this._cellSize + 5,
+							person.position.y * this._cellSize + 5
+						)
+						person?.act()
 					}
 				}
-
-				let fps = sketch.frameRate()
-				sketch.fill(255)
-				sketch.stroke(0)
-				sketch.text('FPS: ' + fps.toFixed(2), 10, this._y - 10)
+				this.showStats(sketch)
 			}
 		}
-
 		this._p5 = new p5(runable)
+	}
+
+	/**
+	 * Display stats like FPS, Susceptible, recovered, infectd, dead
+	 * @param sketch p5 instance
+	 */
+	private showStats(sketch: p5) {
+		let fps = sketch.frameRate()
+		sketch.fill(255)
+		sketch.stroke(0)
+		sketch.text('FPS: ' + fps.toFixed(2), 10, this._height - 10)
+
+		sketch.fill(255)
+		sketch.stroke(0)
+
+		let basePos = 80
+		sketch.text('SU: ' + this.suceptible, basePos, this._height - 10)
+		sketch.text('IN: ' + this.infected, basePos + 50, this._height - 10)
+		sketch.text('RE: ' + this.reocvered, basePos + 50 * 2, this._height - 10)
+		sketch.text('DE: ' + this.dead, basePos + 50 * 3, this._height - 10)
 	}
 
 	/**
@@ -135,19 +169,19 @@ export class Simulator {
 		// Diplay grid
 		this._p5.stroke('#0C2E45')
 		this._p5.strokeWeight(0.1)
-		for (var x = 0; x < this._x; x += this._cellSize) {
-			for (var y = 0; y < this._y; y += this._cellSize) {
-				this._p5.line(x, 0, x, this._y)
-				this._p5.line(0, y, this._x, y)
+		for (var x = 0; x < this._width; x += this._cellSize) {
+			for (var y = 0; y < this._height; y += this._cellSize) {
+				this._p5.line(x, 0, x, this._height)
+				this._p5.line(0, y, this._width, y)
 			}
 		}
 	}
 
 	/**
-	 * Populates the grid with people
+	 * Populates the grid with people at random positions
 	 */
 	private populateGrid() {
-		let grid = this._simulationArea.grid
+		// Counter for how many positions that are chosen
 		let chosenLocations = 0
 		// Used for debugging tries the selection of cells uses, and also for
 		// failsafing the while loop :D
@@ -155,28 +189,20 @@ export class Simulator {
 		while (chosenLocations < this._entities && tries < 10000) {
 			let chosenX = Math.floor(Math.random() * this._simulationArea.sizeX)
 			let chosenY = Math.floor(Math.random() * this._simulationArea.sizeY)
+			let location = new Point(chosenX, chosenY)
 
-			if (grid[chosenX][chosenY] == null) {
-				let p = new Person(this._simulationArea, new Point(chosenX, chosenY))
-				// ! TEMPORARY COLONG METHOD
-				let a = Math.random()
-				if (a < 0.2) {
-					p.state = Compartment.SUSCEPTIBLE
-				} else if (a < 0.4) {
-					p.state = Compartment.INFECTED
-					p.isInQuarantine = true
-				} else if (a < 0.6) {
-					p.state = Compartment.RECOVERED
-				} else {
-					p.state = Compartment.DEAD
-				}
-				// ! END TEMPORARY COLORING
-
-				grid[chosenX][chosenY] = p
+			if (this._simulationArea.getObjectAtLocation(location) == null) {
+				let p = new Person(this._simulationArea, location)
+				this._persons.push(p)
+				this._simulationArea.addToLocation(p, location)
 				chosenLocations++
 			}
 			tries++
 		}
+
+		//! INFECT ONLY A SINGLE PERSON
+		this._persons[0].infect()
+
 		console.log(`Generated ${this._entities} in ${tries} tries`)
 	}
 }
