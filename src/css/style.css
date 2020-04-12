@@ -15,11 +15,39 @@ h1 {
 	align-items: center;
 }
 
+.susceptible-color {
+	color: #139bff;
+}
+
+.infected-color {
+	color: #e5345e;
+}
+
+.recovered-color {
+	color: #4af87b;
+}
+
+.dead-color {
+	color: #9c00ff;
+}
+
 .container section {
 	flex: 0 0 auto;
 }
 
 #statistics-container {
 	width: 650px;
-	height: 250px;
+}
+
+.inline-block-list {
+	padding: 0;
+}
+
+.inline-block-list li {
+	display: inline-block;
+	padding: 1rem 1rem 1rem 0;
+}
+
+.uppercase {
+	text-transform: uppercase;
 }
