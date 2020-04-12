@@ -38,6 +38,14 @@ var myLineChart = new Chart(ctx, {
 		],
 	},
 	options: {
+		tooltips: {
+			mode: 'index',
+			intersect: false,
+		},
+		hover: {
+			mode: 'nearest',
+			intersect: 'true',
+		},
 		color: '#000',
 		responsive: true,
 		maintainAspectRatio: false,
