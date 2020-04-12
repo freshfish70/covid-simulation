@@ -2,14 +2,24 @@ import p5, { Color } from 'p5'
 import { Grid } from './Grid'
 import { Person, Compartment } from './Person'
 import { Point } from './Point'
-import { QuadTree } from './QuadTree'
+import { SimColors } from './SimColors'
 import { Obstacle } from './Obstacle'
+
+export interface ReportData {
+	susceptible: number
+	infected: number
+	recovered: number
+	dead: number
+	peakInfected: number
+}
 
 export class Simulator {
 	private _p5: p5
 
+	// Width of the canvas
 	private _width: number
 
+	// Height of the canvas
 	private _height: number
 
 	// The size of a cell that an entity will be living in
@@ -30,11 +40,16 @@ export class Simulator {
 	// All persons that are in the simulations
 	private _persons: Array<Person> = new Array()
 
+	// All obstacles in the simulator
 	private _obstacles: Array<Obstacle> = new Array()
 
-	private peakInfectedConcurrent = 0
+	// Callback to notify outisde sources for when frames are don rendering
+	private frameUpdateCallback: (arg: ReportData) => void | null
 
 	// ! Temporary
+
+	// Peak number of infected simultaneously
+	private peakInfectedConcurrent = 0
 
 	private infected = 0
 
@@ -43,20 +58,21 @@ export class Simulator {
 	private reocvered = 0
 
 	private dead = 0
+
 	private infectedPeople = 0
 
 	// !END TEMPORARY
 
-	constructor(x: number, y: number, numberOfEntities: number) {
+	constructor(width: number, height: number, numberOfEntities: number) {
 		// Just make sure we get even sized cells
-		if (x % this._cellSize > 0)
+		if (width % this._cellSize > 0)
 			throw new Error(`X size is not divideable by ${this._cellSize}`)
 
-		if (y % this._cellSize > 0)
+		if (height % this._cellSize > 0)
 			throw new Error(`Y size is not divideable by ${this._cellSize}`)
 
-		this._width = x
-		this._height = y
+		this._width = width
+		this._height = height
 		this._entities = numberOfEntities
 
 		this._simulationArea = new Grid(
@@ -86,12 +102,15 @@ export class Simulator {
 			 */
 			sketch.setup = () => {
 				sketch.createCanvas(this._width, this._height, 'p2d')
-				this.populateGrid()
 				sketch.frameRate(this._framerate)
-				sketch.background('#081B2E')
+				sketch.background(SimColors.SIMBG)
+
+				this.populateGrid()
 				console.log('Setup complete')
 
-				// sketch.noLoop()
+				this.pause()
+				// Make sure we draw the first frame, so something is displayed
+				sketch.draw()
 			}
 			/**
 			 * Runs each frame
@@ -105,15 +124,15 @@ export class Simulator {
 					this.dead = 0
 					this.infectedPeople = 0
 
-					sketch.background('#081B2E')
+					sketch.background(SimColors.SIMBG)
 					// this.showGrid()
 
 					for (const person of this._persons) {
 						//! TEMPORARY COLORING METHOD
 						if (person.isInQuarantine) {
-							sketch.fill('#081B2E')
-							sketch.strokeWeight(0.3)
-							sketch.stroke('#999')
+							sketch.fill(SimColors.QUARANTINE)
+							sketch.strokeWeight(1)
+							sketch.stroke(SimColors.QUARANTINE)
 							sketch.rectMode('center')
 							sketch.rect(
 								person.position.x * this._cellSize + 5,
@@ -125,23 +144,23 @@ export class Simulator {
 						switch (person.state) {
 							case Compartment.SUSCEPTIBLE:
 								this.suceptible++
-								sketch.stroke('#FFDE91')
+								sketch.stroke(SimColors.SUSCEPTIBLE)
 								break
 							case Compartment.INFECTED:
 								this.infectedPeople +=
 									person.peopleInfected + person.avgInfections
-
 								this.infected++
-								sketch.stroke('#B32144')
-								// sketch.stroke('#4265B3')
+								sketch.stroke(SimColors.INFECTED)
 								break
 							case Compartment.RECOVERED:
 								this.reocvered++
-								sketch.stroke('#12ABB3')
+								sketch.stroke(SimColors.RECOVERED)
+
 								break
 							case Compartment.DEAD:
 								this.dead++
-								sketch.stroke('#000')
+								sketch.stroke(SimColors.DEAD)
+
 								break
 							default:
 								sketch.stroke('#fff')
@@ -151,8 +170,8 @@ export class Simulator {
 
 						sketch.strokeWeight(5)
 						sketch.point(
-							person.position.x * this._cellSize + 5,
-							person.position.y * this._cellSize + 5
+							person.position.x * this._cellSize + this._cellSize / 2,
+							person.position.y * this._cellSize + this._cellSize / 2
 						)
 						person?.act()
 					}
@@ -173,6 +192,17 @@ export class Simulator {
 					if (this.infected > this.peakInfectedConcurrent) {
 						this.peakInfectedConcurrent = this.infected
 					}
+					if (this.frameUpdateCallback != null) {
+						let arg: ReportData = {
+							susceptible: this.suceptible,
+							infected: this.infected,
+							dead: this.dead,
+							recovered: this.reocvered,
+							peakInfected: this.peakInfectedConcurrent,
+						}
+						this.frameUpdateCallback(arg)
+					}
+
 					// this.infectedPeople = (this.infected / this.infectedPeople).toFixed(3)
 					this.infectedPeople = (this.infectedPeople / this.infected).toFixed(3)
 				}
@@ -185,6 +215,10 @@ export class Simulator {
 			}
 		}
 		this._p5 = new p5(runable)
+	}
+
+	public registerFrameUpdateCallback(cb: (data: ReportData) => void) {
+		this.frameUpdateCallback = cb
 	}
 
 	/**
@@ -242,16 +276,13 @@ export class Simulator {
 		// Used for debugging tries the selection of cells uses, and also for
 		// failsafing the while loop :D
 		let tries = 0
-		console.log(this._entities)
 
 		let qpopulationQuarantine = this._entities - this._entities / 4
-		console.log(qpopulationQuarantine)
-
 		let epopulationQuarantine = this._entities - this._entities / 8
 
 		let quarantined = 0
 
-		if (this.forcedQuarantine) this.forcedQurantine()
+		if (this.forcedQuarantine) this.createWallObstacle()
 
 		while (chosenLocations < this._entities && tries < 100000) {
 			let chosenX = Math.floor(Math.random() * this._simulationArea.sizeX)
@@ -277,12 +308,12 @@ export class Simulator {
 		}
 
 		//! INFECT ONLY A SINGLE PERSON
-		this._persons[90].infect()
+		this._persons[this._entities - 2].infect()
 
 		console.log(`Generated ${this._entities} in ${tries} tries`)
 	}
 
-	private forcedQurantine() {
+	private createWallObstacle() {
 		const cellsHeight = this._height / this._cellSize
 		for (let index = 0; index < cellsHeight; index++) {
 			let po = new Point(15, index)

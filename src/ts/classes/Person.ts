@@ -16,22 +16,31 @@ export class Person extends GridLocation {
 	/**
 	 * Time stamp when person was infected
 	 */
-	private _infectionTime: number = 0
+	private _infectionTime: Date = new Date()
 
 	/**
 	 * Time person uses to recover (milliseconds)
 	 */
-	private readonly _recoveryTime: number = 7000
+	private readonly _recoveryTime: number = 10
 
 	/**
 	 * How many have this person ifected
 	 */
 	private _peopleInfected: number = 0
 
+	private _daysInfected = 0
+
+	private _avgInfections = 0
+
 	/**
 	 * Is the person in quarantine?
 	 */
 	private _inQuarantine = false
+
+	/**
+	 * The chance of dying when infected
+	 */
+	private readonly _chanceOfDeath = 3.8
 
 	constructor(grid: Grid, position: Point) {
 		super(grid, position)
@@ -53,24 +62,46 @@ export class Person extends GridLocation {
 		this._inQuarantine = quarantine
 	}
 
+	public get peopleInfected(): number {
+		return this._peopleInfected
+	}
+
+	public get avgInfections(): number {
+		return this._avgInfections
+	}
+
 	/**
 	 * Infects the person, and set a time stamp for when the person was infected
 	 */
 	public infect() {
-		this._infectionTime = Date.now()
+		this._infectionTime = new Date()
 		this._state = Compartment.INFECTED
 	}
 
 	public act() {
 		// Quarantined, and dead peaple cant act.
-		if (this._state == Compartment.DEAD || this._inQuarantine) return
 
 		if (this.state == Compartment.INFECTED) {
+			let currentDay =
+				(new Date().getTime() - this._infectionTime.getTime()) / 1000
+
 			this.tryInfectSurounings()
-			if (this._infectionTime + this._recoveryTime < Date.now()) {
-				this.state = Compartment.RECOVERED
+			if (currentDay > this._daysInfected) {
+				this._daysInfected++
+				this._avgInfections =
+					this._peopleInfected / this._daysInfected + 1 / this._recoveryTime
+				// console.log('Infextion day ' + this._daysInfected)
+			}
+
+			if (this._daysInfected == this._recoveryTime) {
+				if (Math.random() * 100 <= this._chanceOfDeath) {
+					this.state = Compartment.DEAD
+				} else {
+					this.state = Compartment.RECOVERED
+				}
 			}
 		}
+		if (this._state == Compartment.DEAD || this._inQuarantine) return
 
 		// Move entity to new position of there are any free positions around
 		this.setNewPosition(
@@ -91,8 +122,8 @@ export class Person extends GridLocation {
 			const person = this.grid.getObjectAtLocation(location)
 			if (person instanceof Person) {
 				if (person.state == Compartment.SUSCEPTIBLE) {
-					person.infect()
 					this._peopleInfected++
+					person.infect()
 				}
 			}
 		})
