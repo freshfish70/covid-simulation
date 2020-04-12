@@ -13,6 +13,21 @@ export interface ReportData {
 	peakInfected: number
 }
 
+export interface SimulatorConfig {
+	width: number
+	height: number
+	entities: number
+	scenario: Scenario
+	canvasContainer: HTMLElement | undefined
+}
+
+export enum Scenario {
+	FREEFORALL,
+	FORCED_QUARANTINE,
+	QUARTER_FREE,
+	ONE_IN_EIGHT_FREE,
+}
+
 export class Simulator {
 	private _p5: p5
 
