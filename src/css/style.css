@@ -1,9 +1,25 @@
 body {
+	color: #fff;
 	background: #1d2125;
 }
 
-#canvas-container {
-	width: 45vw;
-	height: 400px;
-	float: left;
+h1 {
+	color: #139bff;
+}
+
+.container {
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+}
+
+.container section {
+	flex: 0 0 auto;
+}
+
+#statistics-container {
+	width: 650px;
+	height: 250px;
 }

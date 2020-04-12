@@ -63,7 +63,12 @@ export class Simulator {
 
 	// !END TEMPORARY
 
-	constructor(width: number, height: number, numberOfEntities: number) {
+	constructor(
+		width: number,
+		height: number,
+		numberOfEntities: number,
+		canvasContainer: HTMLElement | undefined
+	) {
 		// Just make sure we get even sized cells
 		if (width % this._cellSize > 0)
 			throw new Error(`X size is not divideable by ${this._cellSize}`)
@@ -80,7 +85,7 @@ export class Simulator {
 			this._height / this._cellSize
 		)
 
-		this.initialize()
+		this.initialize(canvasContainer)
 	}
 
 	public start() {
@@ -95,7 +100,7 @@ export class Simulator {
 	 * Initializes P5 and bind the setup and
 	 * draw functions
 	 */
-	private initialize() {
+	private initialize(canvasContainer: HTMLElement | undefined) {
 		const runable = (sketch: p5) => {
 			/**
 			 * Runs once
@@ -214,7 +219,7 @@ export class Simulator {
 				}
 			}
 		}
-		this._p5 = new p5(runable)
+		this._p5 = new p5(runable, canvasContainer)
 	}
 
 	public registerFrameUpdateCallback(cb: (data: ReportData) => void) {
@@ -241,7 +246,7 @@ export class Simulator {
 		sketch.text('DE: ' + this.dead, basePos + 100 * 3, this._height - 10)
 		sketch.text(
 			'R: ' + this.infectedPeople,
-			basePos + 50 * 4,
+			basePos + 100 * 4,
 			this._height - 10
 		)
 	}
@@ -265,7 +270,7 @@ export class Simulator {
 
 	private quarterMoving = false
 
-	private oneInEightMoving = true
+	private oneInEightMoving = false
 
 	/**
 	 * Populates the grid with people at random positions

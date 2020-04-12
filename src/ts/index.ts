@@ -9,18 +9,18 @@ var myLineChart = new Chart(ctx, {
 		labels: [],
 		datasets: [
 			{
-				label: 'Infected',
+				label: 'Suceptible',
 				data: [],
-				borderColor: '#B32144',
+				borderColor: '#139bff',
 				borderWidth: 1,
 				pointRadius: 0,
 				color: '#00ff00',
 				fill: false,
 			},
 			{
-				label: 'Suceptible',
+				label: 'Infected',
 				data: [],
-				borderColor: '#FFDE91',
+				borderColor: '#e5345e',
 				borderWidth: 1,
 				pointRadius: 0,
 				color: '#00ff00',
@@ -29,7 +29,7 @@ var myLineChart = new Chart(ctx, {
 			{
 				label: 'Recovered',
 				data: [],
-				borderColor: '#12ABB3',
+				borderColor: '#4af87b',
 				color: '#00ff00',
 				fill: false,
 				borderWidth: 1,
@@ -45,6 +45,7 @@ var myLineChart = new Chart(ctx, {
 			display: true,
 			text: 'Statistics',
 		},
+
 		scales: {
 			yAxes: [
 				{
@@ -52,7 +53,12 @@ var myLineChart = new Chart(ctx, {
 						beginAtZero: true,
 						suggestedMin: 0,
 						suggestedMax: 200,
+						fontColor: '#fff',
 					},
+					gridLines: {
+						color: '#161616',
+					},
+					color: '#fff',
 				},
 			],
 			xAxes: [
@@ -64,12 +70,18 @@ var myLineChart = new Chart(ctx, {
 	},
 })
 
-const simulator = new Simulator(650, 650, 200)
+let container = document.getElementById('simulator-container')
+const simulator = new Simulator(
+	650,
+	400,
+	200,
+	container ? container : undefined
+)
 simulator.registerFrameUpdateCallback((data: ReportData) => {
 	myLineChart.data.labels.push('label')
+	myLineChart.data.datasets[0].data.push(data.susceptible)
+	myLineChart.data.datasets[1].data.push(data.infected)
 	myLineChart.data.datasets[2].data.push(data.recovered)
-	myLineChart.data.datasets[1].data.push(data.susceptible)
-	myLineChart.data.datasets[0].data.push(data.infected)
 	myLineChart.update()
 })
 
