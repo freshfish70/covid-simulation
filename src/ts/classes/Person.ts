@@ -40,7 +40,7 @@ export class Person extends GridLocation {
 	/**
 	 * The chance of dying when infected
 	 */
-	private readonly _chanceOfDeath = 3.8
+	private _chanceOfDeath = 3.8
 
 	constructor(grid: Grid, position: Point) {
 		super(grid, position)
@@ -127,6 +127,16 @@ export class Person extends GridLocation {
 				}
 			}
 		})
+	}
+
+	/**
+	 * Enables or disables deaths
+	 * @param allow true to allow deaths, false to disable
+	 */
+	public allowDeath(allow: boolean) {
+		if (!allow) {
+			this._chanceOfDeath = 0
+		}
 	}
 }
 

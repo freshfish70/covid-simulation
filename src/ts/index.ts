@@ -1,110 +1,171 @@
-import { Simulator, ReportData } from './classes/Simulator'
+import {
+	Simulator,
+	ReportData,
+	SimulatorConfig,
+	Scenario,
+} from './classes/Simulator'
+import { chartConfig } from './ChartConfig'
 // import {chart} from 'chart.js'
 
-var ctx = document.getElementById('statistics-chart')
+var ctx = document.getElementById('statistics-chart-free-for-all')
 // ctx.style.backgroundColor = ''
-var myLineChart = new Chart(ctx, {
-	type: 'line',
-	data: {
-		labels: [],
-		datasets: [
-			{
-				label: 'Suceptible',
-				data: [],
-				borderColor: '#139bff',
-				borderWidth: 1,
-				pointRadius: 0,
-				color: '#00ff00',
-				fill: false,
-			},
-			{
-				label: 'Infected',
-				data: [],
-				borderColor: '#e5345e',
-				borderWidth: 1,
-				pointRadius: 0,
-				color: '#00ff00',
-				fill: false,
-			},
-			{
-				label: 'Recovered',
-				data: [],
-				borderColor: '#4af87b',
-				color: '#00ff00',
-				fill: false,
-				borderWidth: 1,
-				pointRadius: 0,
-			},
-		],
-	},
-	options: {
-		tooltips: {
-			mode: 'index',
-			intersect: false,
-		},
-		hover: {
-			mode: 'nearest',
-			intersect: 'true',
-		},
-		color: '#000',
-		responsive: true,
-		maintainAspectRatio: false,
-		title: {
-			display: true,
-			text: 'Statistics',
-		},
 
-		scales: {
-			yAxes: [
-				{
-					ticks: {
-						beginAtZero: true,
-						suggestedMin: 0,
-						suggestedMax: 200,
-						fontColor: '#fff',
-					},
-					gridLines: {
-						color: '#161616',
-					},
-					color: '#fff',
-				},
-			],
-			xAxes: [
-				{
-					display: false,
-				},
-			],
-		},
-	},
-})
-
-let container = document.getElementById('simulator-container')
-const simulator = new Simulator(
-	650,
-	400,
-	200,
-	container ? container : undefined
+var freeforallchart = new Chart(ctx, JSON.parse(JSON.stringify(chartConfig)))
+let freeforallcontainer = document.getElementById(
+	'simulator-container-free-for-all'
 )
-simulator.registerFrameUpdateCallback((data: ReportData) => {
-	myLineChart.data.labels.push('label')
-	myLineChart.data.datasets[0].data.push(data.susceptible)
-	myLineChart.data.datasets[1].data.push(data.infected)
-	myLineChart.data.datasets[2].data.push(data.recovered)
-	myLineChart.update()
+const freeforallsimulator = new Simulator({
+	width: 650,
+	height: 400,
+	entities: 200,
+	scenario: Scenario.FREEFORALL,
+	canvasContainer: freeforallcontainer ? freeforallcontainer : undefined,
+	allowDeaths: false,
+} as SimulatorConfig)
+freeforallsimulator.registerFrameUpdateCallback((data: ReportData) => {
+	freeforallchart.data.labels.push('label')
+	freeforallchart.data.datasets[0].data.push(data.susceptible)
+	freeforallchart.data.datasets[1].data.push(data.infected)
+	freeforallchart.data.datasets[2].data.push(data.recovered)
+	freeforallchart.update()
 })
 
-let start_button = document.getElementById('start-button')
-let pause_button = document.getElementById('pause-button')
-let restart_button = document.getElementById('restart-button')
+document
+	.getElementById('start-button-free-for-all')
+	?.addEventListener('click', (e) => {
+		freeforallsimulator.start()
+	})
 
-start_button?.addEventListener('click', (e) => {
-	simulator.start()
+document
+	.getElementById('pause-button-free-for-all')
+	?.addEventListener('click', (e) => {
+		freeforallsimulator.pause()
+	})
+
+document
+	.getElementById('restart-button-free-for-all')
+	?.addEventListener('click', (e) => {
+		console.log('clicked')
+	})
+
+var ctx = document.getElementById('statistics-chart-forced-quarantine')
+var forcedQuarantinechart = new Chart(
+	ctx,
+	JSON.parse(JSON.stringify(chartConfig))
+)
+let forcedQuarantinecontainer = document.getElementById(
+	'simulator-container-forced-quarantine'
+)
+const forcedQuarantineSimulator = new Simulator({
+	width: 650,
+	height: 400,
+	entities: 200,
+	scenario: Scenario.FORCED_QUARANTINE,
+	canvasContainer: forcedQuarantinecontainer
+		? forcedQuarantinecontainer
+		: undefined,
+	allowDeaths: false,
+} as SimulatorConfig)
+forcedQuarantineSimulator.registerFrameUpdateCallback((data: ReportData) => {
+	forcedQuarantinechart.data.labels.push('label')
+	forcedQuarantinechart.data.datasets[0].data.push(data.susceptible)
+	forcedQuarantinechart.data.datasets[1].data.push(data.infected)
+	forcedQuarantinechart.data.datasets[2].data.push(data.recovered)
+	forcedQuarantinechart.update()
 })
 
-pause_button?.addEventListener('click', (e) => {
-	simulator.pause()
+document
+	.getElementById('start-button-forced-quarantine')
+	?.addEventListener('click', (e) => {
+		forcedQuarantineSimulator.start()
+	})
+
+document
+	.getElementById('pause-button-forced-quarantine')
+	?.addEventListener('click', (e) => {
+		forcedQuarantineSimulator.pause()
+	})
+
+document
+	.getElementById('restart-button-forced-quarantine')
+	?.addEventListener('click', (e) => {
+		console.log('clicked')
+	})
+
+var ctx = document.getElementById('statistics-chart-quarter-free')
+var quarterFreechart = new Chart(ctx, JSON.parse(JSON.stringify(chartConfig)))
+let quarterFreecontainer = document.getElementById(
+	'simulator-container-quarter-free'
+)
+const quarterFreeSimulator = new Simulator({
+	width: 650,
+	height: 400,
+	entities: 200,
+	scenario: Scenario.QUARTER_FREE,
+	canvasContainer: quarterFreecontainer ? quarterFreecontainer : undefined,
+	allowDeaths: false,
+} as SimulatorConfig)
+quarterFreeSimulator.registerFrameUpdateCallback((data: ReportData) => {
+	quarterFreechart.data.labels.push('label')
+	quarterFreechart.data.datasets[0].data.push(data.susceptible)
+	quarterFreechart.data.datasets[1].data.push(data.infected)
+	quarterFreechart.data.datasets[2].data.push(data.recovered)
+	quarterFreechart.update()
 })
 
-restart_button?.addEventListener('click', (e) => {
-	console.log('clicked')
+document
+	.getElementById('start-button-quarter-free')
+	?.addEventListener('click', (e) => {
+		quarterFreeSimulator.start()
+	})
+
+document
+	.getElementById('pause-button-quarter-free')
+	?.addEventListener('click', (e) => {
+		quarterFreeSimulator.pause()
+	})
+
+document
+	.getElementById('restart-button-quarter-free')
+	?.addEventListener('click', (e) => {
+		console.log('clicked')
+	})
+
+var ctx = document.getElementById('statistics-chart-one-eighth-free')
+var oneEighthChart = new Chart(ctx, JSON.parse(JSON.stringify(chartConfig)))
+let oneEightContainer = document.getElementById(
+	'simulator-container-one-eighth-free'
+)
+const oneEightSimulator = new Simulator({
+	width: 650,
+	height: 400,
+	entities: 200,
+	scenario: Scenario.ONE_IN_EIGHT_FREE,
+	canvasContainer: oneEightContainer ? oneEightContainer : undefined,
+	allowDeaths: false,
+} as SimulatorConfig)
+oneEightSimulator.registerFrameUpdateCallback((data: ReportData) => {
+	oneEighthChart.data.labels.push('label')
+	oneEighthChart.data.datasets[0].data.push(data.susceptible)
+	oneEighthChart.data.datasets[1].data.push(data.infected)
+	oneEighthChart.data.datasets[2].data.push(data.recovered)
+	oneEighthChart.update()
 })
+
+document
+	.getElementById('start-button-one-eighth-free')
+	?.addEventListener('click', (e) => {
+		oneEightSimulator.start()
+	})
+
+document
+	.getElementById('pause-button-one-eighth-free')
+	?.addEventListener('click', (e) => {
+		oneEightSimulator.pause()
+	})
+
+document
+	.getElementById('restart-button-one-eighth-free')
+	?.addEventListener('click', (e) => {
+		console.log('clicked')
+	})

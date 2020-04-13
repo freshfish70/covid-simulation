@@ -19,6 +19,7 @@ export interface SimulatorConfig {
 	entities: number
 	scenario: Scenario
 	canvasContainer: HTMLElement | undefined
+	allowDeaths: boolean
 }
 
 export enum Scenario {
@@ -31,11 +32,7 @@ export enum Scenario {
 export class Simulator {
 	private _p5: p5
 
-	// Width of the canvas
-	private _width: number
-
-	// Height of the canvas
-	private _height: number
+	private _config: SimulatorConfig
 
 	// The size of a cell that an entity will be living in
 	private readonly _cellSize: number = 10
@@ -48,9 +45,6 @@ export class Simulator {
 
 	// The grid, where all entities are stored in idividual cells.
 	private _simulationArea: Grid
-
-	// Number of entities/persons in the simulation
-	private readonly _entities: number
 
 	// All persons that are in the simulations
 	private _persons: Array<Person> = new Array()
@@ -78,29 +72,21 @@ export class Simulator {
 
 	// !END TEMPORARY
 
-	constructor(
-		width: number,
-		height: number,
-		numberOfEntities: number,
-		canvasContainer: HTMLElement | undefined
-	) {
+	constructor(config: SimulatorConfig) {
 		// Just make sure we get even sized cells
-		if (width % this._cellSize > 0)
+		if (config.width % this._cellSize > 0)
 			throw new Error(`X size is not divideable by ${this._cellSize}`)
 
-		if (height % this._cellSize > 0)
+		if (config.height % this._cellSize > 0)
 			throw new Error(`Y size is not divideable by ${this._cellSize}`)
-
-		this._width = width
-		this._height = height
-		this._entities = numberOfEntities
+		this._config = config
 
 		this._simulationArea = new Grid(
-			this._width / this._cellSize,
-			this._height / this._cellSize
+			this._config.width / this._cellSize,
+			this._config.height / this._cellSize
 		)
 
-		this.initialize(canvasContainer)
+		this.initialize(config.canvasContainer)
 	}
 
 	public start() {
@@ -121,7 +107,7 @@ export class Simulator {
 			 * Runs once
 			 */
 			sketch.setup = () => {
-				sketch.createCanvas(this._width, this._height, 'p2d')
+				sketch.createCanvas(this._config.width, this._config.height, 'p2d')
 				sketch.frameRate(this._framerate)
 				sketch.background(SimColors.SIMBG)
 
@@ -249,20 +235,24 @@ export class Simulator {
 		let fps = sketch.frameRate()
 		sketch.fill(255)
 		sketch.stroke(0)
-		sketch.text('FPS: ' + fps.toFixed(2), 10, this._height - 10)
+		sketch.text('FPS: ' + fps.toFixed(2), 10, this._config.height - 10)
 
 		sketch.fill(255)
 		sketch.stroke(0)
 
 		let basePos = 80
-		sketch.text('SU: ' + this.suceptible, basePos, this._height - 10)
-		sketch.text('IN: ' + this.infected, basePos + 100, this._height - 10)
-		sketch.text('RE: ' + this.reocvered, basePos + 100 * 2, this._height - 10)
-		sketch.text('DE: ' + this.dead, basePos + 100 * 3, this._height - 10)
+		sketch.text('SU: ' + this.suceptible, basePos, this._config.height - 10)
+		sketch.text('IN: ' + this.infected, basePos + 100, this._config.height - 10)
+		sketch.text(
+			'RE: ' + this.reocvered,
+			basePos + 100 * 2,
+			this._config.height - 10
+		)
+		sketch.text('DE: ' + this.dead, basePos + 100 * 3, this._config.height - 10)
 		sketch.text(
 			'R: ' + this.infectedPeople,
 			basePos + 100 * 4,
-			this._height - 10
+			this._config.height - 10
 		)
 	}
 
@@ -273,10 +263,10 @@ export class Simulator {
 		// Diplay grid
 		this._p5.stroke('#0C2E45')
 		this._p5.strokeWeight(0.1)
-		for (var x = 0; x < this._width; x += this._cellSize) {
-			for (var y = 0; y < this._height; y += this._cellSize) {
-				this._p5.line(x, 0, x, this._height)
-				this._p5.line(0, y, this._width, y)
+		for (var x = 0; x < this._config.width; x += this._cellSize) {
+			for (var y = 0; y < this._config.height; y += this._cellSize) {
+				this._p5.line(x, 0, x, this._config.height)
+				this._p5.line(0, y, this._config.width, y)
 			}
 		}
 	}
@@ -297,28 +287,17 @@ export class Simulator {
 		// failsafing the while loop :D
 		let tries = 0
 
-		let qpopulationQuarantine = this._entities - this._entities / 4
-		let epopulationQuarantine = this._entities - this._entities / 8
+		if (this._config.scenario == Scenario.FORCED_QUARANTINE)
+			this.createWallObstacle()
 
-		let quarantined = 0
-
-		if (this.forcedQuarantine) this.createWallObstacle()
-
-		while (chosenLocations < this._entities && tries < 100000) {
+		while (chosenLocations < this._config.entities && tries < 100000) {
 			let chosenX = Math.floor(Math.random() * this._simulationArea.sizeX)
 			let chosenY = Math.floor(Math.random() * this._simulationArea.sizeY)
 			let location = new Point(chosenX, chosenY)
 
 			if (this._simulationArea.getObjectAtLocation(location) == null) {
 				let p = new Person(this._simulationArea, location)
-				if (this.quarterMoving && quarantined <= qpopulationQuarantine) {
-					p.isInQuarantine = true
-					quarantined++
-				}
-				if (this.oneInEightMoving && quarantined <= epopulationQuarantine) {
-					p.isInQuarantine = true
-					quarantined++
-				}
+				p.allowDeath(this._config.allowDeaths)
 
 				this._persons.push(p)
 				this._simulationArea.addToLocation(p, location)
@@ -327,14 +306,35 @@ export class Simulator {
 			tries++
 		}
 
-		//! INFECT ONLY A SINGLE PERSON
-		this._persons[this._entities - 2].infect()
+		if (this._config.scenario == Scenario.ONE_IN_EIGHT_FREE) {
+			this.quarantinePopulation(
+				this._config.entities - this._config.entities / 8
+			)
+		} else if (this._config.scenario == Scenario.QUARTER_FREE) {
+			this.quarantinePopulation(
+				this._config.entities - this._config.entities / 4
+			)
+		}
 
-		console.log(`Generated ${this._entities} in ${tries} tries`)
+		//! INFECT ONLY A SINGLE PERSON
+		this._persons[0].infect()
+
+		console.log(`Generated ${this._config.entities} in ${tries} tries`)
+	}
+
+	/**
+	 * Puts the number of population in quarantine
+	 * @param personsToQuarantine number of people to quarantine
+	 */
+	private quarantinePopulation(personsToQuarantine: number) {
+		for (let index = 0; index < personsToQuarantine; index++) {
+			const p = this._persons[index]
+			p.isInQuarantine = true
+		}
 	}
 
 	private createWallObstacle() {
-		const cellsHeight = this._height / this._cellSize
+		const cellsHeight = this._config.height / this._cellSize
 		for (let index = 0; index < cellsHeight; index++) {
 			let po = new Point(15, index)
 			let ob = new Obstacle(this._simulationArea, po)
