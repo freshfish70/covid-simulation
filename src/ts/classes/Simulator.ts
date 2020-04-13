@@ -356,7 +356,7 @@ export class Simulator {
 		}
 
 		//! INFECT ONLY A SINGLE PERSON
-		this._persons[0].infect()
+		this._persons[0].infect(true)
 
 		console.log(`Generated ${this._config.entities} in ${tries} tries`)
 	}

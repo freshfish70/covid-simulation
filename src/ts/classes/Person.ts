@@ -84,9 +84,11 @@ export class Person extends GridLocation {
 	/**
 	 * Infects the person, and set a time stamp for when the person was infected
 	 */
-	public infect() {
+	public infect(force: boolean): boolean {
+		if (Math.random() < 0.5 && !force) return false
 		this._stepInfected = this._currentTimeStep
 		this._state = Compartment.INFECTED
+		return true
 	}
 
 	public act() {
@@ -130,8 +132,11 @@ export class Person extends GridLocation {
 			const person = this.grid.getObjectAtLocation(location)
 			if (person instanceof Person) {
 				if (person.state == Compartment.SUSCEPTIBLE) {
+					if (this.isInQuarantine && person.isInQuarantine) return
+
+					if (person.infect(false)) {
 					this._peopleInfected++
-					person.infect()
+					}
 				}
 			}
 		})
