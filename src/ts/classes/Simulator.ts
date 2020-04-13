@@ -134,70 +134,19 @@ export class Simulator {
 					// this.showGrid()
 
 					for (const person of this._persons) {
-						//! TEMPORARY COLORING METHOD
 						if (person.isInQuarantine) {
-							sketch.fill(SimColors.QUARANTINE)
-							sketch.strokeWeight(1)
-							sketch.stroke(SimColors.QUARANTINE)
-							sketch.rectMode('center')
-							sketch.rect(
-								person.position.x * this._cellSize + 5,
-								person.position.y * this._cellSize + 5,
-								this._cellSize,
-								this._cellSize
-							)
+							this.drawQuanrantineMarker(person.position)
 						}
-						switch (person.state) {
-							case Compartment.SUSCEPTIBLE:
-								this.suceptible++
-								sketch.stroke(SimColors.SUSCEPTIBLE)
-								break
-							case Compartment.INFECTED:
-								this.infectedPeople +=
-									person.peopleInfected + person.avgInfections
-								this.infected++
-								sketch.stroke(SimColors.INFECTED)
-								break
-							case Compartment.RECOVERED:
-								this.reocvered++
-								sketch.stroke(SimColors.RECOVERED)
-
-								break
-							case Compartment.DEAD:
-								this.dead++
-								sketch.stroke(SimColors.DEAD)
-
-								break
-							default:
-								sketch.stroke('#fff')
-								break
-						}
-						//! END TEMPORARY COLORING METHOD
-
-						sketch.strokeWeight(5)
-						sketch.point(
-							person.position.x * this._cellSize + this._cellSize / 2,
-							person.position.y * this._cellSize + this._cellSize / 2
-						)
+						this.drawPerson(person)
 						person?.act()
 					}
-					for (const obs of this._obstacles) {
-						sketch.stroke('#fff')
 
-						sketch.strokeWeight(1)
-						sketch.rectMode('center')
-						sketch.rect(
-							obs.position.x * this._cellSize + 5,
-							obs.position.y * this._cellSize + 5,
-							2,
-							2
-						)
-					}
+					this.drawObstacles()
 
-					// console.log(this.infectedPeople)
 					if (this.infected > this.peakInfectedConcurrent) {
 						this.peakInfectedConcurrent = this.infected
 					}
+
 					if (this.frameUpdateCallback != null) {
 						let arg: ReportData = {
 							susceptible: this.suceptible,
@@ -221,6 +170,79 @@ export class Simulator {
 			}
 		}
 		this._p5 = new p5(runable, canvasContainer)
+	}
+
+	/**
+	 *  Draws all obstacles
+	 */
+	private drawObstacles() {
+		for (const obs of this._obstacles) {
+			this._p5.stroke('#fff')
+			this._p5.strokeWeight(1)
+			this._p5.rectMode('center')
+			this._p5.rect(
+				obs.position.x * this._cellSize + 5,
+				obs.position.y * this._cellSize + 5,
+				2,
+				2
+			)
+		}
+	}
+
+	/**
+	 * Draws a person on the canvas, ang selects the correct color for the person
+	 * @param person the person to draw
+	 */
+	private drawPerson(person: Person) {
+		let color = '#000000'
+
+		switch (person.state) {
+			case Compartment.SUSCEPTIBLE:
+				this.suceptible++
+				color = SimColors.SUSCEPTIBLE
+				break
+			case Compartment.INFECTED:
+				this.infectedPeople += person.peopleInfected + person.avgInfections
+				this.infected++
+				color = SimColors.INFECTED
+				break
+			case Compartment.RECOVERED:
+				this.reocvered++
+				color = SimColors.RECOVERED
+
+				break
+			case Compartment.DEAD:
+				this.dead++
+				color = SimColors.DEAD
+
+				break
+			default:
+				color = '#ffffff'
+				break
+		}
+		this._p5.stroke(color)
+		this._p5.strokeWeight(5)
+		this._p5.point(
+			person.position.x * this._cellSize + this._cellSize / 2,
+			person.position.y * this._cellSize + this._cellSize / 2
+		)
+	}
+
+	/**
+	 * Draws quarantine marker on the canvas at given positopn
+	 * @param position the position to draw
+	 */
+	private drawQuanrantineMarker(position: Point) {
+		this._p5.fill(SimColors.QUARANTINE)
+		this._p5.strokeWeight(1)
+		this._p5.stroke(SimColors.QUARANTINE)
+		this._p5.rectMode('center')
+		this._p5.rect(
+			position.x * this._cellSize + 5,
+			position.y * this._cellSize + 5,
+			this._cellSize,
+			this._cellSize
+		)
 	}
 
 	public registerFrameUpdateCallback(cb: (data: ReportData) => void) {
