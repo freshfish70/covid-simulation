@@ -14,12 +14,12 @@ export class Person extends GridLocation {
 	private _state: Compartment = Compartment.SUSCEPTIBLE
 
 	/**
-	 * Time stamp when person was infected
+	 * The day the person was infected
 	 */
-	private _infectionTime: Date = new Date()
+	private _dayInfected: number
 
 	/**
-	 * Time person uses to recover (milliseconds)
+	 * Time person uses to recover (days)
 	 */
 	private readonly _recoveryTime: number = 10
 
@@ -31,6 +31,8 @@ export class Person extends GridLocation {
 	private _daysInfected = 0
 
 	private _avgInfections = 0
+
+	private _currentDay = 0
 
 	/**
 	 * Is the person in quarantine?
@@ -74,39 +76,36 @@ export class Person extends GridLocation {
 	 * Infects the person, and set a time stamp for when the person was infected
 	 */
 	public infect() {
-		this._infectionTime = new Date()
+		this._dayInfected = this._currentDay
 		this._state = Compartment.INFECTED
 	}
 
 	public act() {
-		// Quarantined, and dead peaple cant act.
-
 		if (this.state == Compartment.INFECTED) {
-			let currentDay =
-				(new Date().getTime() - this._infectionTime.getTime()) / 1000
-
 			this.tryInfectSurounings()
-			if (currentDay > this._daysInfected) {
-				this._daysInfected++
-				this._avgInfections =
-					this._peopleInfected / this._daysInfected + 1 / this._recoveryTime
-				// console.log('Infextion day ' + this._daysInfected)
-			}
-
-			if (this._daysInfected == this._recoveryTime) {
+			if (this._currentDay - this._dayInfected == this._recoveryTime) {
 				if (Math.random() * 100 <= this._chanceOfDeath) {
 					this.state = Compartment.DEAD
 				} else {
 					this.state = Compartment.RECOVERED
 				}
+			} else {
+				this._daysInfected++
+				this._avgInfections =
+					this._peopleInfected / this._daysInfected + 1 / this._recoveryTime
 			}
 		}
+
 		if (this._state == Compartment.DEAD || this._inQuarantine) return
 
 		// Move entity to new position of there are any free positions around
 		this.setNewPosition(
 			this.grid.getRandomFreeLocationFromPoint(this.position, 1)
 		)
+	}
+
+	public addDay() {
+		this._currentDay++
 	}
 
 	/**

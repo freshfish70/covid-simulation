@@ -55,6 +55,10 @@ export class Simulator {
 	// Callback to notify outisde sources for when frames are don rendering
 	private frameUpdateCallback: (arg: ReportData) => void | null
 
+	private day = 0
+
+	private dayTime = new Date()
+
 	// ! Temporary
 
 	// Peak number of infected simultaneously
@@ -91,6 +95,7 @@ export class Simulator {
 
 	public start() {
 		this._p5.loop()
+		this.dayTime = new Date()
 	}
 
 	public pause() {
@@ -122,6 +127,7 @@ export class Simulator {
 			 * Runs each frame
 			 */
 			sketch.draw = () => {
+				let currentDay = (new Date().getTime() - this.dayTime.getTime()) / 1000
 				if (sketch.frameCount % this._runspeed == 0) {
 					// !Improve this
 					this.suceptible = 0
@@ -138,6 +144,9 @@ export class Simulator {
 							this.drawQuanrantineMarker(person.position)
 						}
 						this.drawPerson(person)
+						if (currentDay > this.day) {
+							person?.addDay()
+						}
 						person?.act()
 					}
 
@@ -159,7 +168,9 @@ export class Simulator {
 					}
 
 					// this.infectedPeople = (this.infected / this.infectedPeople).toFixed(3)
-					this.infectedPeople = (this.infectedPeople / this.infected).toFixed(3)
+					if (currentDay > this.day) {
+						this.day++
+					}
 				}
 				this.showStats(sketch)
 				if (this.infected == 0 && this.reocvered > 0) {
