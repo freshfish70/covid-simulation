@@ -14,9 +14,9 @@ export class Person extends GridLocation {
 	private _state: Compartment = Compartment.SUSCEPTIBLE
 
 	/**
-	 * The day the person was infected
+	 * The time step person was infected
 	 */
-	private _dayInfected: number
+	private _stepInfected: number = 0
 
 	/**
 	 * Time person uses to recover (days)
@@ -28,11 +28,20 @@ export class Person extends GridLocation {
 	 */
 	private _peopleInfected: number = 0
 
-	private _daysInfected = 0
+	/**
+	 * How many steps this person has been infected
+	 */
+	private _stepsInfected = 0
 
+	/**
+	 * Average infections for this person based on days infected
+	 */
 	private _avgInfections = 0
 
-	private _currentDay = 0
+	/**
+	 * the current time step for the person
+	 */
+	private _currentTimeStep = 0
 
 	/**
 	 * Is the person in quarantine?
@@ -76,23 +85,23 @@ export class Person extends GridLocation {
 	 * Infects the person, and set a time stamp for when the person was infected
 	 */
 	public infect() {
-		this._dayInfected = this._currentDay
+		this._stepInfected = this._currentTimeStep
 		this._state = Compartment.INFECTED
 	}
 
 	public act() {
 		if (this.state == Compartment.INFECTED) {
 			this.tryInfectSurounings()
-			if (this._currentDay - this._dayInfected == this._recoveryTime) {
+			if (this._currentTimeStep - this._stepInfected == this._recoveryTime) {
 				if (Math.random() * 100 <= this._chanceOfDeath) {
 					this.state = Compartment.DEAD
 				} else {
 					this.state = Compartment.RECOVERED
 				}
 			} else {
-				this._daysInfected++
+				this._stepsInfected++
 				this._avgInfections =
-					this._peopleInfected / this._daysInfected + 1 / this._recoveryTime
+					this._peopleInfected / this._stepsInfected + 1 / this._recoveryTime
 			}
 		}
 
@@ -104,8 +113,8 @@ export class Person extends GridLocation {
 		)
 	}
 
-	public addDay() {
-		this._currentDay++
+	public addTimeStep() {
+		this._currentTimeStep++
 	}
 
 	/**
