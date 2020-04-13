@@ -169,6 +169,8 @@ export class Simulator {
 						this.peakInfectedConcurrent = this.infected
 					}
 
+					// this.infectedPeople = (this.infected / this.infectedPeople).toFixed(3)
+					if (currentTimeStep > this.timeStep) {
 					if (this.frameUpdateCallback != null) {
 						let arg: ReportData = {
 							susceptible: this.suceptible,
