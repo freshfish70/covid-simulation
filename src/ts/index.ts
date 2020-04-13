@@ -23,7 +23,7 @@ const freeforallsimulator = new Simulator({
 	allowDeaths: false,
 } as SimulatorConfig)
 freeforallsimulator.registerFrameUpdateCallback((data: ReportData) => {
-	freeforallchart.data.labels.push('label')
+	freeforallchart.data.labels.push(data.day)
 	freeforallchart.data.datasets[0].data.push(data.susceptible)
 	freeforallchart.data.datasets[1].data.push(data.infected)
 	freeforallchart.data.datasets[2].data.push(data.recovered)
@@ -67,7 +67,7 @@ const forcedQuarantineSimulator = new Simulator({
 	allowDeaths: false,
 } as SimulatorConfig)
 forcedQuarantineSimulator.registerFrameUpdateCallback((data: ReportData) => {
-	forcedQuarantinechart.data.labels.push('label')
+	forcedQuarantinechart.data.labels.push(data.day)
 	forcedQuarantinechart.data.datasets[0].data.push(data.susceptible)
 	forcedQuarantinechart.data.datasets[1].data.push(data.infected)
 	forcedQuarantinechart.data.datasets[2].data.push(data.recovered)
@@ -106,7 +106,7 @@ const quarterFreeSimulator = new Simulator({
 	allowDeaths: false,
 } as SimulatorConfig)
 quarterFreeSimulator.registerFrameUpdateCallback((data: ReportData) => {
-	quarterFreechart.data.labels.push('label')
+	quarterFreechart.data.labels.push(data.day)
 	quarterFreechart.data.datasets[0].data.push(data.susceptible)
 	quarterFreechart.data.datasets[1].data.push(data.infected)
 	quarterFreechart.data.datasets[2].data.push(data.recovered)
@@ -145,7 +145,7 @@ const oneEightSimulator = new Simulator({
 	allowDeaths: false,
 } as SimulatorConfig)
 oneEightSimulator.registerFrameUpdateCallback((data: ReportData) => {
-	oneEighthChart.data.labels.push('label')
+	oneEighthChart.data.labels.push(data.day)
 	oneEighthChart.data.datasets[0].data.push(data.susceptible)
 	oneEighthChart.data.datasets[1].data.push(data.infected)
 	oneEighthChart.data.datasets[2].data.push(data.recovered)

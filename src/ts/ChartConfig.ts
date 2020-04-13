@@ -66,7 +66,7 @@ const chartConfig = {
 			],
 			xAxes: [
 				{
-					display: false,
+					display: true,
 				},
 			],
 		},

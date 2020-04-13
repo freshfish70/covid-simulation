@@ -11,6 +11,7 @@ export interface ReportData {
 	recovered: number
 	dead: number
 	peakInfected: number
+	day: number
 }
 
 export interface SimulatorConfig {
@@ -171,6 +172,7 @@ export class Simulator {
 							dead: this.dead,
 							recovered: this.reocvered,
 							peakInfected: this.peakInfectedConcurrent,
+								day: this.totalTimeSteps,
 						}
 						this.frameUpdateCallback(arg)
 					}
