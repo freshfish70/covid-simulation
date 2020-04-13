@@ -61,6 +61,8 @@ export class Simulator {
 
 	private dayTime = new Date()
 
+	private isPaused = false
+
 	// ! Temporary
 
 	// Peak number of infected simultaneously
@@ -99,10 +101,12 @@ export class Simulator {
 		this._p5.loop()
 		this.timeStep = 0
 		this.dayTime = new Date()
+		this.isPaused = false
 	}
 
 	public pause() {
 		this._p5.noLoop()
+		this.isPaused = true
 	}
 
 	/**
@@ -381,6 +385,7 @@ export class Simulator {
 		let times = 0
 		const me = setInterval(
 			() => {
+				if (this.isPaused) return
 				const min = Math.floor(this._obstacles.length / 2) - times
 				const max = Math.floor(this._obstacles.length / 2) + times
 
