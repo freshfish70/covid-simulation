@@ -64,6 +64,8 @@ export class Simulator {
 
 	private isPaused = false
 
+	private isStarted = false
+
 	// ! Temporary
 
 	// Peak number of infected simultaneously
@@ -103,6 +105,7 @@ export class Simulator {
 		this.timeStep = 0
 		this.dayTime = new Date()
 		this.isPaused = false
+		this.isStarted = true
 	}
 
 	public pause() {
@@ -156,7 +159,8 @@ export class Simulator {
 						if (currentTimeStep > this.timeStep) {
 							person?.addTimeStep()
 						}
-						person?.act()
+
+						if (this.isStarted) person?.act()
 					}
 
 					this.drawObstacles()
