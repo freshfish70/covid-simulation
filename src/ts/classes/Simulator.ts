@@ -271,12 +271,6 @@ export class Simulator {
 		}
 	}
 
-	private forcedQuarantine = false
-
-	private quarterMoving = false
-
-	private oneInEightMoving = false
-
 	/**
 	 * Populates the grid with people at random positions
 	 */
