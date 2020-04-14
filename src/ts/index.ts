@@ -5,7 +5,24 @@ import {
 	Scenario,
 } from './classes/Simulator'
 import { chartConfig } from './ChartConfig'
-// import {chart} from 'chart.js'
+import { Chart } from 'chart.js'
+
+let preferedWidth = 500
+let preferedHeight = 250
+let width = document.documentElement.clientWidth
+
+if (width < preferedWidth) {
+	let widthDiff = preferedWidth - width
+	let per = (widthDiff % 10) - 80
+
+	preferedWidth -= widthDiff - per
+	preferedHeight += widthDiff - per
+}
+
+let charts = document.getElementsByClassName('chart-adjust')
+for (const chart of charts) {
+	chart.setAttribute('style', `width: ${preferedWidth}px`)
+}
 
 var ctx = document.getElementById('statistics-chart-free-for-all')
 // ctx.style.backgroundColor = ''
@@ -15,8 +32,8 @@ let freeforallcontainer = document.getElementById(
 	'simulator-container-free-for-all'
 )
 const freeforallsimulator = new Simulator({
-	width: 650,
-	height: 400,
+	width: preferedWidth,
+	height: preferedHeight,
 	entities: 200,
 	scenario: Scenario.FREEFORALL,
 	canvasContainer: freeforallcontainer ? freeforallcontainer : undefined,
@@ -57,8 +74,8 @@ let forcedQuarantinecontainer = document.getElementById(
 	'simulator-container-forced-quarantine'
 )
 const forcedQuarantineSimulator = new Simulator({
-	width: 650,
-	height: 400,
+	width: preferedWidth,
+	height: preferedHeight,
 	entities: 200,
 	scenario: Scenario.FORCED_QUARANTINE,
 	canvasContainer: forcedQuarantinecontainer
@@ -98,8 +115,8 @@ let quarterFreecontainer = document.getElementById(
 	'simulator-container-quarter-free'
 )
 const quarterFreeSimulator = new Simulator({
-	width: 650,
-	height: 400,
+	width: preferedWidth,
+	height: preferedHeight,
 	entities: 200,
 	scenario: Scenario.QUARTER_FREE,
 	canvasContainer: quarterFreecontainer ? quarterFreecontainer : undefined,
@@ -137,8 +154,8 @@ let oneEightContainer = document.getElementById(
 	'simulator-container-one-eighth-free'
 )
 const oneEightSimulator = new Simulator({
-	width: 650,
-	height: 400,
+	width: preferedWidth,
+	height: preferedHeight,
 	entities: 200,
 	scenario: Scenario.ONE_IN_EIGHT_FREE,
 	canvasContainer: oneEightContainer ? oneEightContainer : undefined,
