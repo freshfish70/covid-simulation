@@ -7,14 +7,6 @@ h1 {
 	color: #139bff;
 }
 
-.container {
-	width: 100%;
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	align-items: center;
-}
-
 .susceptible-color {
 	color: #139bff;
 }
@@ -29,14 +21,6 @@ h1 {
 
 .dead-color {
 	color: #9c00ff;
-}
-
-.container section {
-	flex: 0 0 auto;
-}
-
-#statistics-container {
-	width: 650px;
 }
 
 .inline-block-list {
