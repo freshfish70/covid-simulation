@@ -62,6 +62,7 @@ const chartConfig = {
 						color: '#161616',
 					},
 					color: '#fff',
+					display: false,
 				},
 			],
 			xAxes: [
