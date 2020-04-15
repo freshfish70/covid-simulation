@@ -31,7 +31,7 @@ var freeforallchart = new Chart(ctx, JSON.parse(JSON.stringify(chartConfig)))
 let freeforallcontainer = document.getElementById(
 	'simulator-container-free-for-all'
 )
-const freeforallsimulator = new Simulator({
+let freeforallsimulator = new Simulator({
 	width: preferedWidth,
 	height: preferedHeight,
 	entities: 200,
@@ -39,6 +39,7 @@ const freeforallsimulator = new Simulator({
 	canvasContainer: freeforallcontainer ? freeforallcontainer : undefined,
 	allowDeaths: false,
 } as SimulatorConfig)
+
 freeforallsimulator.registerFrameUpdateCallback((data: ReportData) => {
 	freeforallchart.data.labels.push(data.day)
 	freeforallchart.data.datasets[0].data.push(data.susceptible)
@@ -62,7 +63,12 @@ document
 document
 	.getElementById('restart-button-free-for-all')
 	?.addEventListener('click', (e) => {
-		console.log('clicked')
+		freeforallsimulator.restart()
+		freeforallchart.data.labels = []
+		freeforallchart.data.datasets[0].data = []
+		freeforallchart.data.datasets[1].data = []
+		freeforallchart.data.datasets[2].data = []
+		freeforallchart.update()
 	})
 
 var ctx = document.getElementById('statistics-chart-forced-quarantine')
@@ -106,7 +112,12 @@ document
 document
 	.getElementById('restart-button-forced-quarantine')
 	?.addEventListener('click', (e) => {
-		console.log('clicked')
+		forcedQuarantineSimulator.restart()
+		forcedQuarantinechart.data.labels = []
+		forcedQuarantinechart.data.datasets[0].data = []
+		forcedQuarantinechart.data.datasets[1].data = []
+		forcedQuarantinechart.data.datasets[2].data = []
+		forcedQuarantinechart.update()
 	})
 
 var ctx = document.getElementById('statistics-chart-quarter-free')
@@ -145,7 +156,12 @@ document
 document
 	.getElementById('restart-button-quarter-free')
 	?.addEventListener('click', (e) => {
-		console.log('clicked')
+		quarterFreeSimulator.restart()
+		quarterFreechart.data.labels = []
+		quarterFreechart.data.datasets[0].data = []
+		quarterFreechart.data.datasets[1].data = []
+		quarterFreechart.data.datasets[2].data = []
+		quarterFreechart.update()
 	})
 
 var ctx = document.getElementById('statistics-chart-one-eighth-free')
@@ -184,5 +200,10 @@ document
 document
 	.getElementById('restart-button-one-eighth-free')
 	?.addEventListener('click', (e) => {
-		console.log('clicked')
+		oneEightSimulator.restart()
+		oneEighthChart.data.labels = []
+		oneEighthChart.data.datasets[0].data = []
+		oneEighthChart.data.datasets[1].data = []
+		oneEighthChart.data.datasets[2].data = []
+		oneEighthChart.update()
 	})

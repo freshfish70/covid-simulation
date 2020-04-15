@@ -45,7 +45,7 @@ export class Simulator {
 	private readonly _framerate: number = 30
 
 	// The grid, where all entities are stored in idividual cells.
-	private _simulationArea: Grid
+	private _simulationArea!: Grid
 
 	// All persons that are in the simulations
 	private _persons: Array<Person> = new Array()
@@ -65,6 +65,7 @@ export class Simulator {
 	private isPaused = false
 
 	private isStarted = false
+	private isRestarted = false
 
 	// ! Temporary
 
@@ -92,14 +93,14 @@ export class Simulator {
 			throw new Error(`Y size is not divideable by ${this._cellSize}`)
 		this._config = config
 
-		this._simulationArea = new Grid(
-			this._config.width / this._cellSize,
-			this._config.height / this._cellSize
-		)
+		this.createGrid()
 
 		this.initialize(config.canvasContainer)
 	}
 
+	/**
+	 * Start the simulation
+	 */
 	public start() {
 		this._p5.loop()
 		this.timeStep = 0
@@ -108,9 +109,26 @@ export class Simulator {
 		this.isStarted = true
 	}
 
+	/**
+	 * Pauses the simulation
+	 */
 	public pause() {
 		this._p5.noLoop()
 		this.isPaused = true
+	}
+
+	/**
+	 * Restarts the simulator
+	 */
+	public restart() {
+		this.pause()
+		this.isStarted = false
+		this.totalTimeSteps = 0
+		this.dayTime = new Date()
+		this.populateGrid()
+		this.isRestarted = true
+		this._p5.draw()
+		this.isRestarted = false
 	}
 
 	/**
@@ -138,7 +156,10 @@ export class Simulator {
 			 * Runs each frame
 			 */
 			sketch.draw = () => {
-				if (sketch.frameCount % this._runspeed == 0) {
+				if (
+					sketch.frameCount % this._runspeed == 0 ||
+					this.isRestarted == true
+				) {
 					let currentTimeStep =
 						(new Date().getTime() - this.dayTime.getTime()) / 1000
 					// !Improve this
@@ -323,10 +344,23 @@ export class Simulator {
 	}
 
 	/**
+	 * Generates the simulation area grid
+	 */
+	private createGrid() {
+		this._simulationArea = new Grid(
+			this._config.width / this._cellSize,
+			this._config.height / this._cellSize
+		)
+	}
+
+	/**
 	 * Populates the grid with people at random positions
 	 */
 	private populateGrid() {
-		// Counter for how many positions that are chosen
+		this._persons = new Array()
+		this._obstacles = new Array()
+		this.createGrid()
+
 		let chosenLocations = 0
 		// Used for debugging tries the selection of cells uses, and also for
 		// failsafing the while loop :D

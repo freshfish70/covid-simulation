@@ -1,235 +1,187 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta
-			name="viewport"
-			content="width=device-width, initial-scale=1, shrink-to-fit=no"
-		/>
-		<title>COVID-19-SIMULATION</title>
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.bundle.min.js"></script>
-		<script type="module" src="app.js"></script>
-		<link
-			rel="stylesheet"
-			href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
-			integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
-			crossorigin="anonymous"
-		/>
-		<link rel="stylesheet" href="css/style.css" />
-	</head>
 
-	<body>
-		<header class="container">
-			<h1>COVID-19 SIMULATIOR</h1>
-			<p>
-				The simulations on this page was created as a final assignment in the
-				course IR201812 - Statistics and simulation @ NTNU Ålesund. The main
-				task was to reproduce the four scenarios modelled in
-				<a
-					href="https://www.washingtonpost.com/graphics/2020/world/corona-simulator/"
-					class="href"
-				>
-					washington Post - corona simulator
-				</a>
-				. The assignment also had additional parameters and scenarios which had
-				to be implemented and analyzed,
-				<br />
-				<br />
-				<b>Some rules for the assignment:</b>
-			</p>
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+	<title>COVID-19-SIMULATION</title>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.bundle.min.js"></script>
+	<script type="module" src="app.js"></script>
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+		integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous" />
+	<link rel="stylesheet" href="css/style.css" />
+</head>
 
+<body>
+	<header class="container">
+		<h1>COVID-19 SIMULATIOR</h1>
+		<p>
+			The simulations on this page was created as a final assignment in the
+			course IR201812 - Statistics and simulation @ NTNU Ålesund. The main
+			task was to reproduce the four scenarios modelled in
+			<a href="https://www.washingtonpost.com/graphics/2020/world/corona-simulator/" class="href">
+				washington Post - corona simulator
+			</a>
+			. The assignment also had additional parameters and scenarios which had
+			to be implemented and analyzed,
+			<br />
+			<br />
+			<b>Some rules for the assignment:</b>
+		</p>
+
+		<ul>
+			<li>Agent based simulation.</li>
+			<li>
+				Free mobility scenario has to have an infection probability of 2.5
+			</li>
+			<li>200 persons for first experiments.</li>
+			<li>Must include scenarios:</li>
 			<ul>
-				<li>Agent based simulation.</li>
+				<li>Free for all - Every person can move freely.</li>
 				<li>
-					Free mobility scenario has to have an infection probability of 2.5
+					Forced Quarantine - A portion of persons are loced up for a period
+					where one is infected, before the "sluce" is opened graduadly.
 				</li>
-				<li>200 persons for first experiments.</li>
-				<li>Must include scenarios:</li>
-				<ul>
-					<li>Free for all - Every person can move freely.</li>
-					<li>
-						Forced Quarantine - A portion of persons are loced up for a period
-						where one is infected, before the "sluce" is opened graduadly.
-					</li>
-					<li>
-						One quarater - One quartar of the population is allowed to move
-						freely, the rest is in quarantine.
-					</li>
-					<li>
-						One in eighth - Only every eighth person is allowed to move freely,
-						the rest is in quarantine.
-					</li>
-				</ul>
-				<li>Probability of people dying.</li>
 				<li>
-					Scale to 100.000 persons and the area proportionaly and analyze the
-					difference of infected, recovered and dead people.
+					One quarater - One quartar of the population is allowed to move
+					freely, the rest is in quarantine.
 				</li>
-				<li>The effects of age (mortality as a function of age).</li>
+				<li>
+					One in eighth - Only every eighth person is allowed to move freely,
+					the rest is in quarantine.
+				</li>
 			</ul>
+			<li>Probability of people dying.</li>
+			<li>
+				Scale to 100.000 persons and the area proportionaly and analyze the
+				difference of infected, recovered and dead people.
+			</li>
+			<li>The effects of age (mortality as a function of age).</li>
+		</ul>
+		<p>
+			The simulator was written from scratch usning JavaScript (TypeScript),
+			P5js for drawing, and Chart.js for charts. Code is available on GitHub
+			<br />
+			<a href="#GITHUB" class="">GitHub.com - covid-simulator</a>
+		</p>
+	</header>
+	<main class="container">
+		<section id="free-for-all" class="w-100 d-flex flex-column justify-content-center align-items-center">
+			<h2>Free for all</h2>
+			<p>Every person can move freely and no one is in quarantine.</p>
+			<section id="statistics-container-free-for-all" style="max-width: 500px;">
+				<canvas id="statistics-chart-free-for-all" class="chart-adjust" height="250"></canvas>
+			</section>
+			<section id="panel">
+				<button id="start-button-free-for-all">Start</button>
+				<button id="pause-button-free-for-all">Pause</button>
+				<button id="restart-button-free-for-all">Restart</button>
+			</section>
+			<section id="simulator-container-free-for-all">
+				<div class="text-center"></div>
+			</section>
+		</section>
+
+		<section id="forced-quarantine" class="w-100 d-flex flex-column justify-content-center align-items-center">
+			<h2>Forced quarantine</h2>
 			<p>
-				The simulator was written from scratch usning JavaScript (TypeScript),
-				P5js for drawing, and Chart.js for charts. Code is available on GitHub
+				A selection of peaople are in lockdown in seperate region, where one
+				is infected.
 				<br />
-				<a href="#GITHUB" class="">GitHub.com - covid-simulator</a>
+				After some time the gate will open and the infection will spread.
 			</p>
-		</header>
-		<main class="container">
-			<section
-				id="free-for-all"
-				class="w-100 d-flex flex-column justify-content-center align-items-center"
-			>
-				<h2>Free for all</h2>
-				<p>Every person can move freely and no one is in quarantine.</p>
-				<section
-					id="statistics-container-free-for-all"
-					style="max-width: 500px;"
-				>
-					<canvas
-						id="statistics-chart-free-for-all"
-						class="chart-adjust"
-						height="250"
-					></canvas>
-				</section>
-				<section id="panel">
-					<button id="start-button-free-for-all">Start</button>
-					<button id="pause-button-free-for-all">Pause</button>
-					<button id="restart-game-free-for-all">Restart</button>
-				</section>
-				<section id="simulator-container-free-for-all">
-					<div class="text-center"></div>
-				</section>
+			<section id="statistics-container-forced-quarantine" style="max-width: 500px;">
+				<canvas id="statistics-chart-forced-quarantine" class="chart-adjust" height="250"></canvas>
 			</section>
-
-			<section
-				id="forced-quarantine"
-				class="w-100 d-flex flex-column justify-content-center align-items-center"
-			>
-				<h2>Forced quarantine</h2>
-				<p>
-					A selection of peaople are in lockdown in seperate region, where one
-					is infected.
-					<br />
-					After some time the gate will open and the infection will spread.
-				</p>
-				<section
-					id="statistics-container-forced-quarantine"
-					style="max-width: 500px;"
-				>
-					<canvas
-						id="statistics-chart-forced-quarantine"
-						class="chart-adjust"
-						height="250"
-					></canvas>
-				</section>
-				<section id="panel">
-					<button id="start-button-forced-quarantine">Start</button>
-					<button id="pause-button-forced-quarantine">Pause</button>
-					<button id="restart-game-forced-quarantine">Restart</button>
-				</section>
-				<section id="simulator-container-forced-quarantine">
-					<div class="text-center">
-						<ul class="uppercase inline-block-list">
-							<li class="susceptible-color">
-								Susceptible:
-								<span>5</span>
-							</li>
-							<li class="infected-color">
-								Infected:
-								<span>5</span>
-							</li>
-							<li class="recovered-color">
-								Recovered:
-								<span>5</span>
-							</li>
-						</ul>
-					</div>
-				</section>
+			<section id="panel">
+				<button id="start-button-forced-quarantine">Start</button>
+				<button id="pause-button-forced-quarantine">Pause</button>
+				<button id="restart-button-forced-quarantine">Restart</button>
 			</section>
-
-			<section
-				id="quarter-free"
-				class="w-100 d-flex flex-column justify-content-center align-items-center"
-			>
-				<h2>Quarter is free</h2>
-				<p>A quarter of the population can move freely.</p>
-				<section
-					id="statistics-container-quarter-free"
-					style="max-width: 500px;"
-				>
-					<canvas
-						id="statistics-chart-quarter-free"
-						class="chart-adjust"
-						height="250"
-					></canvas>
-				</section>
-				<section id="panel">
-					<button id="start-button-quarter-free">Start</button>
-					<button id="pause-button-quarter-free">Pause</button>
-					<button id="restart-game-quarter-free">Restart</button>
-				</section>
-				<section id="simulator-container-quarter-free">
-					<div class="text-center">
-						<ul class="uppercase inline-block-list">
-							<li class="susceptible-color">
-								Susceptible:
-								<span>5</span>
-							</li>
-							<li class="infected-color">
-								Infected:
-								<span>5</span>
-							</li>
-							<li class="recovered-color">
-								Recovered:
-								<span>5</span>
-							</li>
-						</ul>
-					</div>
-				</section>
+			<section id="simulator-container-forced-quarantine">
+				<div class="text-center">
+					<ul class="uppercase inline-block-list">
+						<li class="susceptible-color">
+							Susceptible:
+							<span>5</span>
+						</li>
+						<li class="infected-color">
+							Infected:
+							<span>5</span>
+						</li>
+						<li class="recovered-color">
+							Recovered:
+							<span>5</span>
+						</li>
+					</ul>
+				</div>
 			</section>
+		</section>
 
-			<section
-				id="one-eighth-free"
-				class="w-100 d-flex flex-column justify-content-center align-items-center"
-			>
-				<h2>One in eighth</h2>
-				<p>Only one eighth of the poplulation can move freely.</p>
-				<section
-					id="statistics-container-one-eighth-free"
-					style="max-width: 500px;"
-				>
-					<canvas
-						id="statistics-chart-one-eighth-free"
-						class="chart-adjust"
-						height="250"
-					></canvas>
-				</section>
-				<section id="panel">
-					<button id="start-button-one-eighth-free">Start</button>
-					<button id="pause-button-one-eighth-free">Pause</button>
-					<button id="restart-game-one-eighth-free">Restart</button>
-				</section>
-				<section id="simulator-container-one-eighth-free">
-					<div class="text-center">
-						<ul class="uppercase inline-block-list">
-							<li class="susceptible-color">
-								Susceptible:
-								<span>5</span>
-							</li>
-							<li class="infected-color">
-								Infected:
-								<span>5</span>
-							</li>
-							<li class="recovered-color">
-								Recovered:
-								<span>5</span>
-							</li>
-						</ul>
-					</div>
-				</section>
+		<section id="quarter-free" class="w-100 d-flex flex-column justify-content-center align-items-center">
+			<h2>Quarter is free</h2>
+			<p>A quarter of the population can move freely.</p>
+			<section id="statistics-container-quarter-free" style="max-width: 500px;">
+				<canvas id="statistics-chart-quarter-free" class="chart-adjust" height="250"></canvas>
 			</section>
-		</main>
+			<section id="panel">
+				<button id="start-button-quarter-free">Start</button>
+				<button id="pause-button-quarter-free">Pause</button>
+				<button id="restart-button-quarter-free">Restart</button>
+			</section>
+			<section id="simulator-container-quarter-free">
+				<div class="text-center">
+					<ul class="uppercase inline-block-list">
+						<li class="susceptible-color">
+							Susceptible:
+							<span>5</span>
+						</li>
+						<li class="infected-color">
+							Infected:
+							<span>5</span>
+						</li>
+						<li class="recovered-color">
+							Recovered:
+							<span>5</span>
+						</li>
+					</ul>
+				</div>
+			</section>
+		</section>
 
-		<footer class="footer">Created by Christoffer A Træen - 2020</footer>
-	</body>
+		<section id="one-eighth-free" class="w-100 d-flex flex-column justify-content-center align-items-center">
+			<h2>One in eighth</h2>
+			<p>Only one eighth of the poplulation can move freely.</p>
+			<section id="statistics-container-one-eighth-free" style="max-width: 500px;">
+				<canvas id="statistics-chart-one-eighth-free" class="chart-adjust" height="250"></canvas>
+			</section>
+			<section id="panel">
+				<button id="start-button-one-eighth-free">Start</button>
+				<button id="pause-button-one-eighth-free">Pause</button>
+				<button id="restart-button-one-eighth-free">Restart</button>
+			</section>
+			<section id="simulator-container-one-eighth-free">
+				<div class="text-center">
+					<ul class="uppercase inline-block-list">
+						<li class="susceptible-color">
+							Susceptible:
+							<span>5</span>
+						</li>
+						<li class="infected-color">
+							Infected:
+							<span>5</span>
+						</li>
+						<li class="recovered-color">
+							Recovered:
+							<span>5</span>
+						</li>
+					</ul>
+				</div>
+			</section>
+		</section>
+	</main>
+
+	<footer class="footer">Created by Christoffer A Træen - 2020</footer>
+</body>
+
 </html>
