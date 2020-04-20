@@ -373,8 +373,12 @@ export class Simulator {
 		// failsafing the while loop :D
 		let tries = 0
 
-		if (this._config.scenario == Scenario.FORCED_QUARANTINE)
+		let infectLimit = null
+
+		if (this._config.scenario == Scenario.FORCED_QUARANTINE) {
 			this.createWallObstacle()
+			infectLimit = new Point(10, this._config.height / this._cellSize)
+		}
 
 		while (chosenLocations < this._config.entities && tries < 100000) {
 			let chosenX = Math.floor(Math.random() * this._simulationArea.sizeX)
@@ -401,11 +405,30 @@ export class Simulator {
 				this._config.entities - this._config.entities / 4
 			)
 		}
-
 		//! INFECT ONLY A SINGLE PERSON
-		this._persons[0].infect(true)
+		this.infectOneRandom(infectLimit)
+	}
 
-		console.log(`Generated ${this._config.entities} in ${tries} tries`)
+	/**
+	 * Infects a single person. The infection can be limited
+	 * by X and Y, where the person has to be in the X and Y range.
+	 * @param limit area limit
+	 */
+	private infectOneRandom(limit?: Point | null) {
+		for (const p of this._persons) {
+			if (p.isInQuarantine) {
+				continue
+			}
+			if (limit) {
+				if (p.position.x <= limit.x && p.position.y <= limit.y) {
+					p.infect(true)
+					break
+				}
+			} else {
+				p.infect(true)
+				break
+			}
+		}
 	}
 
 	/**
