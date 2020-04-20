@@ -21,6 +21,7 @@ export interface SimulatorConfig {
 	scenario: Scenario
 	canvasContainer: HTMLElement | undefined
 	allowDeaths: boolean
+	allowAge: boolean
 }
 
 export enum Scenario {
@@ -130,6 +131,12 @@ export class Simulator {
 		this._p5.draw()
 		this.isRestarted = false
 	}
+
+	public enableDeath(allowDeath: boolean) {
+		this._config.allowDeaths = allowDeath
+	}
+
+	public enableAge(allowAge: boolean) {}
 
 	/**
 	 * Initializes P5 and bind the setup and

@@ -19,6 +19,14 @@ if (width < preferedWidth) {
 	preferedHeight += widthDiff - per
 }
 
+function clearChart(chartToReset: Chart) {
+	chartToReset.data.labels = []
+	chartToReset.data.datasets![0].data = []
+	chartToReset.data.datasets![1].data = []
+	chartToReset.data.datasets![2].data = []
+	chartToReset.update()
+}
+
 let charts = document.getElementsByClassName('chart-adjust')
 for (const chart of charts) {
 	chart.setAttribute('style', `width: ${preferedWidth}px`)
@@ -31,6 +39,46 @@ var freeforallchart = new Chart(ctx, JSON.parse(JSON.stringify(chartConfig)))
 let freeforallcontainer = document.getElementById(
 	'simulator-container-free-for-all'
 )
+var allowDeath = document
+	.getElementById('allow-death-checkbox')
+	?.addEventListener('click', (e) => {
+		let target = <HTMLInputElement>e.target
+		freeforallsimulator.enableDeath(target.checked)
+		forcedQuarantineSimulator.enableDeath(target.checked)
+		quarterFreeSimulator.enableDeath(target.checked)
+		oneEightSimulator.enableDeath(target.checked)
+
+		clearChart(freeforallchart)
+		clearChart(forcedQuarantinechart)
+		clearChart(quarterFreechart)
+		clearChart(oneEighthChart)
+
+		freeforallsimulator.restart()
+		forcedQuarantineSimulator.restart()
+		quarterFreeSimulator.restart()
+		oneEightSimulator.restart()
+	})
+
+var allowAge = document
+	.getElementById('allow-age-checkbox')
+	?.addEventListener('click', (e) => {
+		let target = <HTMLInputElement>e.target
+		freeforallsimulator.enableAge(target.checked)
+		forcedQuarantineSimulator.enableAge(target.checked)
+		quarterFreeSimulator.enableAge(target.checked)
+		oneEightSimulator.enableAge(target.checked)
+
+		clearChart(freeforallchart)
+		clearChart(forcedQuarantinechart)
+		clearChart(quarterFreechart)
+		clearChart(oneEighthChart)
+
+		freeforallsimulator.restart()
+		forcedQuarantineSimulator.restart()
+		quarterFreeSimulator.restart()
+		oneEightSimulator.restart()
+	})
+
 let freeforallsimulator = new Simulator({
 	width: preferedWidth,
 	height: preferedHeight,
@@ -64,11 +112,7 @@ document
 	.getElementById('restart-button-free-for-all')
 	?.addEventListener('click', (e) => {
 		freeforallsimulator.restart()
-		freeforallchart.data.labels = []
-		freeforallchart.data.datasets[0].data = []
-		freeforallchart.data.datasets[1].data = []
-		freeforallchart.data.datasets[2].data = []
-		freeforallchart.update()
+		clearChart(freeforallchart)
 	})
 
 var ctx = document.getElementById('statistics-chart-forced-quarantine')
@@ -113,11 +157,7 @@ document
 	.getElementById('restart-button-forced-quarantine')
 	?.addEventListener('click', (e) => {
 		forcedQuarantineSimulator.restart()
-		forcedQuarantinechart.data.labels = []
-		forcedQuarantinechart.data.datasets[0].data = []
-		forcedQuarantinechart.data.datasets[1].data = []
-		forcedQuarantinechart.data.datasets[2].data = []
-		forcedQuarantinechart.update()
+		clearChart(forcedQuarantinechart)
 	})
 
 var ctx = document.getElementById('statistics-chart-quarter-free')
@@ -157,11 +197,7 @@ document
 	.getElementById('restart-button-quarter-free')
 	?.addEventListener('click', (e) => {
 		quarterFreeSimulator.restart()
-		quarterFreechart.data.labels = []
-		quarterFreechart.data.datasets[0].data = []
-		quarterFreechart.data.datasets[1].data = []
-		quarterFreechart.data.datasets[2].data = []
-		quarterFreechart.update()
+		clearChart(quarterFreechart)
 	})
 
 var ctx = document.getElementById('statistics-chart-one-eighth-free')
@@ -201,9 +237,5 @@ document
 	.getElementById('restart-button-one-eighth-free')
 	?.addEventListener('click', (e) => {
 		oneEightSimulator.restart()
-		oneEighthChart.data.labels = []
-		oneEighthChart.data.datasets[0].data = []
-		oneEighthChart.data.datasets[1].data = []
-		oneEighthChart.data.datasets[2].data = []
-		oneEighthChart.update()
+		clearChart(quarterFreechart)
 	})
