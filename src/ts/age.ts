@@ -65,13 +65,13 @@ function getMortalityByAge(age: number) {
 	return flatMortality
 }
 
-let total = -1
+let total = 0
 
 /**
  * Returns a random age by a weighted table
  */
 function selectRandomAge() {
-	if (total < 0) {
+	if (total == 0) {
 		for (let index = 0; index < ageChances.length; index++) {
 			total += ageChances[index].chance
 		}
