@@ -4,6 +4,8 @@ import { Person, Compartment } from './Person'
 import { Point } from './Point'
 import { SimColors } from './SimColors'
 import { Obstacle } from './Obstacle'
+import { flatMortality, getMortalityByAge, selectRandomAge } from '../age'
+import { randomIntFromInterval } from '../random'
 
 export interface ReportData {
 	susceptible: number
@@ -136,7 +138,9 @@ export class Simulator {
 		this._config.allowDeaths = allowDeath
 	}
 
-	public enableAge(allowAge: boolean) {}
+	public enableAge(allowAge: boolean) {
+		this._config.allowAge = allowAge
+	}
 
 	/**
 	 * Initializes P5 and bind the setup and
@@ -387,7 +391,19 @@ export class Simulator {
 
 			if (this._simulationArea.getObjectAtLocation(location) == null) {
 				let p = new Person(this._simulationArea, location)
-				p.allowDeath(this._config.allowDeaths)
+				let personAge = -1
+				let personMortality = flatMortality
+
+				if (this._config.allowAge) {
+					let pa = selectRandomAge()
+					personAge = randomIntFromInterval(pa!.minAge, pa!.maxAge)
+					p.setAge(personAge)
+				}
+				if (this._config.allowDeaths) {
+					personMortality = getMortalityByAge(personAge)
+				}
+
+				p.allowDeath(this._config.allowDeaths, personMortality)
 
 				this._persons.push(p)
 				this._simulationArea.addToLocation(p, location)
@@ -470,7 +486,6 @@ export class Simulator {
 				if (times < 3) {
 					times++
 				} else {
-					console.log('Cleared interval')
 					clearInterval(me)
 				}
 				this._obstacles.splice(min, max - min)

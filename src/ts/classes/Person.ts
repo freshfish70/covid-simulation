@@ -51,7 +51,12 @@ export class Person extends GridLocation {
 	/**
 	 * The chance of dying when infected
 	 */
-	private _chanceOfDeath = 3.8
+	private _chanceOfDeath = 0
+
+	/**
+	 * The age of the person
+	 */
+	private _age = -1
 
 	constructor(grid: Grid, position: Point) {
 		super(grid, position)
@@ -95,8 +100,11 @@ export class Person extends GridLocation {
 		if (this.state == Compartment.INFECTED) {
 			this.tryInfectSurounings()
 			if (this._currentTimeStep - this._stepInfected == this._recoveryTime) {
-				if (Math.random() * 100 <= this._chanceOfDeath) {
+				if (Math.random() <= this._chanceOfDeath) {
 					this.state = Compartment.DEAD
+					console.log(
+						`DEAD - AGE: ${this._age} MORTALITY: ${this._chanceOfDeath}`
+					)
 				} else {
 					this.state = Compartment.RECOVERED
 				}
@@ -146,10 +154,20 @@ export class Person extends GridLocation {
 	 * Enables or disables deaths
 	 * @param allow true to allow deaths, false to disable
 	 */
-	public allowDeath(allow: boolean) {
+	public allowDeath(allow: boolean, mortality: number) {
 		if (!allow) {
 			this._chanceOfDeath = 0
+		} else {
+			this._chanceOfDeath = mortality
 		}
+	}
+
+	/**
+	 * Sets the age of the person in years
+	 * @param age the age in years to set
+	 */
+	public setAge(age: number) {
+		this._age = age
 	}
 }
 
