@@ -27,7 +27,7 @@ const ageChances = [
 	{
 		maxAge: 90,
 		minAge: 80,
-		chance: 0.12,
+		chance: 0.08,
 	},
 	{
 		maxAge: 79,
@@ -45,9 +45,9 @@ const ageChances = [
 		chance: 0.3,
 	},
 	{
-		maxAge: 29,
+		maxAge: 19,
 		minAge: 0,
-		chance: 0.13,
+		chance: 0.17,
 	},
 ]
 
