@@ -1,257 +1,52 @@
-# TypeScript-Babel-Starter
+# Getting started
 
-# What is this?
+- npm install / yarn
+- npm run develop / yarn develop
+- npm run buildwp / yarn buildwp
 
-This is a small sample repository that uses Babel to transform TypeScript to plain JavaScript, and uses TypeScript for type-checking.
-This README will also explain step-by-step how you can set up this repository so you can understand how each component fits together.
+# About the project
 
-For simplicity, we've used `babel-cli` with a bare-bones TypeScript setup, but we'll also demonstrate integration with JSX/React, as well as adding bundlers into the mix.
-Specifically, we'll show off integration with Webpack for if you're deploying an application, and Rollup for if you're producing a library.
+This simulator was created as a final assignment in the course IR201812 - Statistics and simulation @ NTNU Ålesund. The main task was to reproduce the four scenarios modeled in [washington Post - corona simulator ](https://www.washingtonpost.com/graphics/2020/world/corona-simulator/). The assignment also had additional parameters and scenarios which had to be implemented and analyzed,
 
-# How do I use it?
+**Some rules for the assignment:**
 
-## Building the repo
+- Agent based simulation.
 
-```sh
-npm run build
-```
+- Free mobility scenario has to have an infection probability of 2.5
 
-## Type-checking the repo
+- 200 persons for first experiments.
 
-```sh
-npm run type-check
-```
+- Must include scenarios:
 
-And to run in `--watch` mode:
+- - Free for all - Every person can move freely.
+  - Forced Quarantine - A portion of persons are locked up for a period where one is infected, before a the lock is opened gradually.
+  - One quarter - One quarter of the population is allowed to move freely, the rest is in quarantine.
+  - One in eighth - Only every eighth person is allowed to move freely, the rest is in quarantine.
 
-```sh
-npm run type-check:watch
-```
+- Probability of people dying.
 
-# How would I set this up myself?
+- - When age is disabled the mortality for every person is: 3%
 
-## Install your dependencies
+- The effects of age (mortality as a function of age).
 
-Either run the following:
+- - Age: 80+, Mortality: 14.8%
+  - Age: 70+, Mortality: 8%
+  - Age: 60+, Mortality: 3.6%
+  - Age: 50+, Mortality: 1.3%
+  - Age: 40+, Mortality: 0.4%
+  - Age: 30+, Mortality: 0.2%
+  - Age: 20+, Mortality: 0.2%
+  - Age: 10+, Mortality: 0.2%
+  - Age: 0+, Mortality: 0%
 
-```sh
-npm install --save-dev typescript @babel/core @babel/cli @babel/plugin-proposal-class-properties @babel/preset-env @babel/preset-typescript
-```
+- Age distribution when age is enabled
 
-or make sure that you add the appropriate `"devDependencies"` entries to your `package.json` and run `npm install`:
+- - Age: 80-90, Probability: 8%
+  - Age: 60-79, Probability: 20%
+  - Age: 40-59, Probability: 25%
+  - Age: 20-39, Probability: 30%
+  - Age: 0-19, Probability: 17%
 
-```json
-"devDependencies": {
-    "@babel/cli": "^7.8.3",
-    "@babel/core": "^7.8.3",
-    "@babel/plugin-proposal-class-properties": "^7.8.3",
-    "@babel/preset-env": "^7.8.3",
-    "@babel/preset-typescript": "^7.8.3",
-    "typescript": "^3.7.5"
-}
-```
+- Scale simulations to 100.000 persons and the area proportionally and analyze the difference of infected, recovered and dead people. (Requires a good computer, so excluded from online version)
 
-## Create your `tsconfig.json`
-
-Then run
-
-```sh
-tsc --init --declaration --allowSyntheticDefaultImports --target esnext --outDir lib
-```
-
-**Note:** TypeScript also provides a `--declarationDir` option which specifies an output directory for generated declaration files (`.d.ts` files).
-For our uses where `--emitDeclarationOnly` is turned on, `--outDir` works equivalently.
-
-## Create your `.babelrc`
-
-Then copy the `.babelrc` in this repo, or the below:
-
-```json
-{
-    "presets": [
-        "@babel/env",
-        "@babel/typescript"
-    ],
-    "plugins": [
-        "@babel/proposal-class-properties"
-    ]
-}
-```
-
-## Set up your build tasks
-
-Add the following to the `"scripts"` section of your `package.json`
-
-```json
-"scripts": {
-    "type-check": "tsc --noEmit",
-    "type-check:watch": "npm run type-check -- --watch",
-    "build": "npm run build:types && npm run build:js",
-    "build:types": "tsc --emitDeclarationOnly",
-    "build:js": "babel src --out-dir lib --extensions \".ts,.tsx\" --source-maps inline"
-}
-```
-
-# How do I change it?
-
-## Using JSX (and React)
-> Full example available [**here**](https://github.com/a-tarasyuk/react-webpack-typescript-babel)
-
-### Install your dependencies
-
-Install the [@babel/preset-react](https://www.npmjs.com/package/@babel/preset-react) package as well as React, ReactDOM, and their respective type declarations
-
-```sh
-npm install --save react react-dom @types/react @types/react-dom
-npm install --save-dev @babel/preset-react
-```
-
-### Update `.babelrc`
-
-Then add `"@babel/react"` as one of the presets in your `.babelrc`.
-
-### Update `tsconfig.json`
-
-Update your `tsconfig.json` to set `"jsx"` to `"react"`.
-
-### Use a `.tsx` file
-
-Make sure that any files that contain JSX use the `.tsx` extension.
-To get going quickly, just rename `src/index.ts` to `src/index.tsx`, and add the following lines to the bottom:
-
-```ts
-import React from 'react';
-export let z = <div>Hello world!</div>;
-```
-
-## Using Webpack
-
-> Full example available [**here**](https://github.com/a-tarasyuk/webpack-typescript-babel)
-
-### Install your dependencies
-
-```sh
-npm install --save-dev webpack webpack-cli babel-loader
-```
-
-### Create a `webpack.config.js`
-
-Create a `webpack.config.js` at the root of this project with the following contents:
-
-```js
-var path = require('path');
-
-module.exports = {
-    // Change to your "entry-point".
-    entry: './src/index',
-    output: {
-        path: path.resolve(__dirname, 'dist'),
-        filename: 'app.bundle.js'
-    },
-    resolve: {
-        extensions: ['.ts', '.tsx', '.js', '.json']
-    },
-    module: {
-        rules: [{
-            // Include ts, tsx, js, and jsx files.
-            test: /\.(ts|js)x?$/,
-            exclude: /node_modules/,
-            loader: 'babel-loader',
-        }],
-    }
-};
-```
-
-### Create a build task
-
-Add
-
-```json
-"bundle": "webpack"
-```
-
-to the `scripts` section in your `package.json`.
-
-### Run the build task
-
-```sh
-npm run bundle
-```
-
-## Using Rollup
-
-> Full example available [**here**](https://github.com/a-tarasyuk/rollup-typescript-babel)
-
-### Install your dependencies
-
-```sh
-npm install --save-dev rollup rollup-plugin-babel rollup-plugin-node-resolve rollup-plugin-commonjs
-```
-
-### Create a `rollup.config.js`
-
-Create a `rollup.config.js` at the root of this project with the following contents:
-
-```js
-import commonjs from 'rollup-plugin-commonjs';
-import resolve from 'rollup-plugin-node-resolve';
-import babel from 'rollup-plugin-babel';
-import pkg from './package.json';
-
-const extensions = [
-  '.js', '.jsx', '.ts', '.tsx',
-];
-
-const name = 'RollupTypeScriptBabel';
-
-export default {
-  input: './src/index.ts',
-
-  // Specify here external modules which you don't want to include in your bundle (for instance: 'lodash', 'moment' etc.)
-  // https://rollupjs.org/guide/en#external-e-external
-  external: [],
-
-  plugins: [
-    // Allows node_modules resolution
-    resolve({ extensions }),
-
-    // Allow bundling cjs modules. Rollup doesn't understand cjs
-    commonjs(),
-
-    // Compile TypeScript/JavaScript files
-    babel({ extensions, include: ['src/**/*'] }),
-  ],
-
-  output: [{
-    file: pkg.main,
-    format: 'cjs',
-  }, {
-    file: pkg.module,
-    format: 'es',
-  }, {
-    file: pkg.browser,
-    format: 'iife',
-    name,
-
-    // https://rollupjs.org/guide/en#output-globals-g-globals
-    globals: {},
-  }],
-};
-
-```
-
-### Create a build task
-
-Add
-
-```json
-"bundle": "rollup -c"
-```
-
-to the `scripts` section in your `package.json`.
-
-### Run the build task
-
-```sh
-npm run bundle
-```
+The simulator was written from scratch using JavaScript (Typescript), P5js for drawing, and Chart.js for charts. Code is available on GitHub
