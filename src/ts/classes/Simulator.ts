@@ -381,7 +381,7 @@ export class Simulator {
 
 		if (this._config.scenario == Scenario.FORCED_QUARANTINE) {
 			this.createWallObstacle()
-			infectLimit = new Point(10, this._config.height / this._cellSize)
+			infectLimit = new Point(3, this._config.height / this._cellSize)
 		}
 
 		while (chosenLocations < this._config.entities && tries < 100000) {
@@ -461,7 +461,7 @@ export class Simulator {
 	private createWallObstacle() {
 		const cellsHeight = this._config.height / this._cellSize
 		for (let index = 0; index < cellsHeight; index++) {
-			let po = new Point(15, index)
+			let po = new Point(Math.ceil((2.0 * this._config.width) / 100), index)
 			let ob = new Obstacle(this._simulationArea, po)
 			this._simulationArea.addToLocation(ob, po)
 			this._obstacles.push(ob)
@@ -490,7 +490,7 @@ export class Simulator {
 				}
 				this._obstacles.splice(min, max - min)
 			},
-			2000,
+			3000,
 			this
 		)
 	}
