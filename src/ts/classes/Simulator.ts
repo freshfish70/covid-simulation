@@ -42,7 +42,7 @@ export class Simulator {
 	private readonly _cellSize: number = 10
 
 	// How fast the simulaition will go
-	private readonly _runspeed: number = 2
+	private readonly _runspeed: number = 3
 
 	// The desired frame rate to run the simulation at
 	private readonly _framerate: number = 30
@@ -83,7 +83,9 @@ export class Simulator {
 
 	private dead = 0
 
-	private infectedPeople = 0
+	private averageInfections = 0
+
+	private listOfRemoved: Array<Person> = new Array()
 
 	// !END TEMPORARY
 
@@ -127,6 +129,8 @@ export class Simulator {
 		this.pause()
 		this.isStarted = false
 		this.totalTimeSteps = 0
+		this.averageInfections = 0
+		this.listOfRemoved = new Array()
 		this.dayTime = new Date()
 		this.populateGrid()
 		this.isRestarted = true
@@ -174,11 +178,11 @@ export class Simulator {
 					let currentTimeStep =
 						(new Date().getTime() - this.dayTime.getTime()) / 1000
 					// !Improve this
+
 					this.suceptible = 0
 					this.infected = 0
 					this.reocvered = 0
 					this.dead = 0
-					this.infectedPeople = 0
 
 					sketch.background(SimColors.SIMBG)
 					// this.showGrid()
@@ -203,21 +207,18 @@ export class Simulator {
 
 					// this.infectedPeople = (this.infected / this.infectedPeople).toFixed(3)
 					if (currentTimeStep > this.timeStep) {
-					if (this.frameUpdateCallback != null) {
-						let arg: ReportData = {
-							susceptible: this.suceptible,
-							infected: this.infected,
-							dead: this.dead,
-							recovered: this.reocvered,
-							peakInfected: this.peakInfectedConcurrent,
+						if (this.frameUpdateCallback != null) {
+							let arg: ReportData = {
+								susceptible: this.suceptible,
+								infected: this.infected,
+								dead: this.dead,
+								recovered: this.reocvered,
+								peakInfected: this.peakInfectedConcurrent,
 								day: this.totalTimeSteps,
+							}
+							this.frameUpdateCallback(arg)
 						}
-						this.frameUpdateCallback(arg)
-					}
-
-					this.lastInfected = this.infected
-					// this.infectedPeople = (this.infected / this.infectedPeople).toFixed(3)
-					if (currentTimeStep > this.timeStep) {
+						this.calculateAverageInfections()
 						this.timeStep++
 						this.totalTimeSteps++
 					}
@@ -231,6 +232,18 @@ export class Simulator {
 			}
 		}
 		this._p5 = new p5(runable, canvasContainer)
+	}
+
+	/**
+	 * Calculates the average infections
+	 */
+	private calculateAverageInfections() {
+		let totalInfectedForAllPersons = 0
+		for (const p of this.listOfRemoved) {
+			totalInfectedForAllPersons += p.peopleInfected
+		}
+		this.averageInfections =
+			totalInfectedForAllPersons / this.listOfRemoved.length
 	}
 
 	/**
@@ -263,7 +276,6 @@ export class Simulator {
 				color = SimColors.SUSCEPTIBLE
 				break
 			case Compartment.INFECTED:
-				this.infectedPeople += person.peopleInfected + person.avgInfections
 				this.infected++
 				color = SimColors.INFECTED
 				break
@@ -384,6 +396,9 @@ export class Simulator {
 
 			if (this._simulationArea.getObjectAtLocation(location) == null) {
 				let p = new Person(this._simulationArea, location)
+				p.onRemovedCallback((person: Person) => {
+					this.listOfRemoved.push(person)
+				})
 				let personAge = -1
 				let personMortality = flatMortality
 
@@ -431,10 +446,12 @@ export class Simulator {
 			if (limit) {
 				if (p.position.x <= limit.x && p.position.y <= limit.y) {
 					p.infect(true)
+					this.listOfRemoved.push(p)
 					break
 				}
 			} else {
 				p.infect(true)
+				this.listOfRemoved.push(p)
 				break
 			}
 		}

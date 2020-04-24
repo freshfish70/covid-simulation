@@ -21,7 +21,7 @@ export class Person extends GridLocation {
 	/**
 	 * Time person uses to recover (days)
 	 */
-	private readonly _recoveryTime: number = 10
+	private readonly _recoveryTime: number = 14
 
 	/**
 	 * How many have this person ifected
@@ -58,6 +58,11 @@ export class Person extends GridLocation {
 	 */
 	private _age = -1
 
+	/**
+	 * Hodlds a callback to a method that notifyies when the persin is recovered/dead (removed in SIR model)
+	 */
+	private _onRemovedCallback?: (person: Person) => void
+
 	constructor(grid: Grid, position: Point) {
 		super(grid, position)
 	}
@@ -90,7 +95,9 @@ export class Person extends GridLocation {
 	 * Infects the person, and set a time stamp for when the person was infected
 	 */
 	public infect(force: boolean): boolean {
-		if (Math.random() < 0.5 && !force) return false
+		if (Math.random() < 0.9 && force == false) {
+			return false
+		}
 		this._stepInfected = this._currentTimeStep
 		this._state = Compartment.INFECTED
 		return true
@@ -108,10 +115,13 @@ export class Person extends GridLocation {
 				} else {
 					this.state = Compartment.RECOVERED
 				}
+
+				if (this._onRemovedCallback) {
+					this._onRemovedCallback(this)
+				}
 			} else {
 				this._stepsInfected++
-				this._avgInfections =
-					this._peopleInfected / this._stepsInfected + 1 / this._recoveryTime
+				this._avgInfections = this._peopleInfected / this._stepsInfected
 			}
 		}
 
@@ -143,11 +153,21 @@ export class Person extends GridLocation {
 					if (this.isInQuarantine && person.isInQuarantine) return
 
 					if (person.infect(false)) {
-					this._peopleInfected++
+						this._peopleInfected++
 					}
 				}
 			}
 		})
+	}
+
+	/**
+	 * Registers a callback for when the person is considered Removed in SIR
+	 * model terms (recoverd/dead)
+	 *
+	 * @param callback callback method
+	 */
+	public onRemovedCallback(callback: (person: Person) => void) {
+		this._onRemovedCallback = callback
 	}
 
 	/**
