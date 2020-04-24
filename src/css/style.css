@@ -3,6 +3,19 @@ body {
 	background: #1d2125;
 }
 
+main,
+header {
+	padding: 2rem 0;
+}
+
+.footer {
+	text-align: center;
+}
+
+.panel {
+	margin: 1rem 0;
+}
+
 h1 {
 	color: #139bff;
 }
