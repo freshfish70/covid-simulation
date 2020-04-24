@@ -32,10 +32,14 @@ for (const chart of charts) {
 	chart.setAttribute('style', `width: ${preferedWidth}px`)
 }
 
-var ctx = document.getElementById('statistics-chart-free-for-all')
-// ctx.style.backgroundColor = ''
+var ffcanvas = <HTMLCanvasElement>(
+	document.getElementById('statistics-chart-free-for-all')
+)
 
-var freeforallchart = new Chart(ctx, JSON.parse(JSON.stringify(chartConfig)))
+var freeforallchart = new Chart(
+	ffcanvas,
+	JSON.parse(JSON.stringify(chartConfig))
+)
 let freeforallcontainer = document.getElementById(
 	'simulator-container-free-for-all'
 )
@@ -89,11 +93,13 @@ let freeforallsimulator = new Simulator({
 } as SimulatorConfig)
 
 freeforallsimulator.registerFrameUpdateCallback((data: ReportData) => {
-	freeforallchart.data.labels.push(data.day)
-	freeforallchart.data.datasets[0].data.push(data.susceptible)
-	freeforallchart.data.datasets[1].data.push(data.infected)
-	freeforallchart.data.datasets[2].data.push(data.recovered)
-	freeforallchart.update()
+	freeforallchart.data.labels?.push(data.day)
+	if (freeforallchart.data.datasets) {
+		freeforallchart.data.datasets[0].data!.push(data.susceptible)
+		freeforallchart.data.datasets[1].data!.push(data.infected)
+		freeforallchart.data.datasets[2].data!.push(data.recovered)
+		freeforallchart.update()
+	}
 })
 
 document
@@ -115,9 +121,11 @@ document
 		clearChart(freeforallchart)
 	})
 
-var ctx = document.getElementById('statistics-chart-forced-quarantine')
+var fqcanvas = <HTMLCanvasElement>(
+	document.getElementById('statistics-chart-forced-quarantine')
+)
 var forcedQuarantinechart = new Chart(
-	ctx,
+	fqcanvas,
 	JSON.parse(JSON.stringify(chartConfig))
 )
 let forcedQuarantinecontainer = document.getElementById(
@@ -134,11 +142,13 @@ const forcedQuarantineSimulator = new Simulator({
 	allowDeaths: false,
 } as SimulatorConfig)
 forcedQuarantineSimulator.registerFrameUpdateCallback((data: ReportData) => {
-	forcedQuarantinechart.data.labels.push(data.day)
-	forcedQuarantinechart.data.datasets[0].data.push(data.susceptible)
-	forcedQuarantinechart.data.datasets[1].data.push(data.infected)
-	forcedQuarantinechart.data.datasets[2].data.push(data.recovered)
-	forcedQuarantinechart.update()
+	forcedQuarantinechart.data.labels?.push(data.day)
+	if (forcedQuarantinechart.data.datasets) {
+		forcedQuarantinechart.data.datasets[0].data!.push(data.susceptible)
+		forcedQuarantinechart.data.datasets[1].data!.push(data.infected)
+		forcedQuarantinechart.data.datasets[2].data!.push(data.recovered)
+		forcedQuarantinechart.update()
+	}
 })
 
 document
@@ -160,8 +170,13 @@ document
 		clearChart(forcedQuarantinechart)
 	})
 
-var ctx = document.getElementById('statistics-chart-quarter-free')
-var quarterFreechart = new Chart(ctx, JSON.parse(JSON.stringify(chartConfig)))
+var qfcanvas = <HTMLCanvasElement>(
+	document.getElementById('statistics-chart-quarter-free')
+)
+var quarterFreechart = new Chart(
+	qfcanvas,
+	JSON.parse(JSON.stringify(chartConfig))
+)
 let quarterFreecontainer = document.getElementById(
 	'simulator-container-quarter-free'
 )
@@ -173,12 +188,15 @@ const quarterFreeSimulator = new Simulator({
 	canvasContainer: quarterFreecontainer ? quarterFreecontainer : undefined,
 	allowDeaths: false,
 } as SimulatorConfig)
+
 quarterFreeSimulator.registerFrameUpdateCallback((data: ReportData) => {
-	quarterFreechart.data.labels.push(data.day)
-	quarterFreechart.data.datasets[0].data.push(data.susceptible)
-	quarterFreechart.data.datasets[1].data.push(data.infected)
-	quarterFreechart.data.datasets[2].data.push(data.recovered)
-	quarterFreechart.update()
+	quarterFreechart.data.labels?.push(data.day)
+	if (quarterFreechart.data.datasets) {
+		quarterFreechart.data.datasets[0].data!.push(data.susceptible)
+		quarterFreechart.data.datasets[1].data!.push(data.infected)
+		quarterFreechart.data.datasets[2].data!.push(data.recovered)
+		quarterFreechart.update()
+	}
 })
 
 document
@@ -200,8 +218,13 @@ document
 		clearChart(quarterFreechart)
 	})
 
-var ctx = document.getElementById('statistics-chart-one-eighth-free')
-var oneEighthChart = new Chart(ctx, JSON.parse(JSON.stringify(chartConfig)))
+var oecanvas = <HTMLCanvasElement>(
+	document.getElementById('statistics-chart-one-eighth-free')
+)
+var oneEighthChart = new Chart(
+	oecanvas,
+	JSON.parse(JSON.stringify(chartConfig))
+)
 let oneEightContainer = document.getElementById(
 	'simulator-container-one-eighth-free'
 )
@@ -214,11 +237,13 @@ const oneEightSimulator = new Simulator({
 	allowDeaths: false,
 } as SimulatorConfig)
 oneEightSimulator.registerFrameUpdateCallback((data: ReportData) => {
-	oneEighthChart.data.labels.push(data.day)
-	oneEighthChart.data.datasets[0].data.push(data.susceptible)
-	oneEighthChart.data.datasets[1].data.push(data.infected)
-	oneEighthChart.data.datasets[2].data.push(data.recovered)
-	oneEighthChart.update()
+	oneEighthChart.data.labels?.push(data.day)
+	if (oneEighthChart.data.datasets) {
+		oneEighthChart.data.datasets[0].data!.push(data.susceptible)
+		oneEighthChart.data.datasets[1].data!.push(data.infected)
+		oneEighthChart.data.datasets[2].data!.push(data.recovered)
+		oneEighthChart.update()
+	}
 })
 
 document
