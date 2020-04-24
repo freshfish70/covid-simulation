@@ -341,7 +341,7 @@ export class Simulator {
 		sketch.text('IN: ' + this.infected, 10, basePos + 20 * 3)
 		sketch.text('RE: ' + this.reocvered, 10, basePos + 20 * 4)
 		sketch.text('DE: ' + this.dead, 10, basePos + 20 * 5)
-		sketch.text('R: ' + this.averageInfections, 10, basePos + 20 * 6)
+		sketch.text('R: ' + this.averageInfections.toFixed(2), 10, basePos + 20 * 6)
 	}
 
 	/**
