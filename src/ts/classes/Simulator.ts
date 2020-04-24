@@ -317,26 +317,19 @@ export class Simulator {
 	private showStats(sketch: p5) {
 		let fps = sketch.frameRate()
 		sketch.fill(255)
+		sketch.strokeWeight(1)
 		sketch.stroke(0)
-		sketch.text('FPS: ' + fps.toFixed(2), 10, this._config.height - 10)
+		sketch.text('FPS: ' + fps.toFixed(2), 10, 20)
 
 		sketch.fill(255)
 		sketch.stroke(0)
 
-		let basePos = 80
-		sketch.text('SU: ' + this.suceptible, basePos, this._config.height - 10)
-		sketch.text('IN: ' + this.infected, basePos + 100, this._config.height - 10)
-		sketch.text(
-			'RE: ' + this.reocvered,
-			basePos + 100 * 2,
-			this._config.height - 10
-		)
-		sketch.text('DE: ' + this.dead, basePos + 100 * 3, this._config.height - 10)
-		sketch.text(
-			'R: ' + this.infectedPeople,
-			basePos + 100 * 4,
-			this._config.height - 10
-		)
+		let basePos = 10
+		sketch.text('SU: ' + this.suceptible, 10, basePos + 20 * 2)
+		sketch.text('IN: ' + this.infected, 10, basePos + 20 * 3)
+		sketch.text('RE: ' + this.reocvered, 10, basePos + 20 * 4)
+		sketch.text('DE: ' + this.dead, 10, basePos + 20 * 5)
+		sketch.text('R: ' + this.averageInfections, 10, basePos + 20 * 6)
 	}
 
 	/**
